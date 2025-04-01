@@ -308,7 +308,7 @@ export default function Home() {
                     className="w-full bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90"
                     asChild
                   >
-                    <Link href="/signup?plan=basic">Get Started</Link>
+                    <Link href="/signup">Get Started</Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -350,7 +350,7 @@ export default function Home() {
                     className="w-full bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90"
                     asChild
                   >
-                    <Link href="/signup?plan=performance">Get Started</Link>
+                    <Link href="/signup">Get Started</Link>
                   </Button>
                 </CardFooter>
               </Card>
