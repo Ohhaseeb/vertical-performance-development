@@ -72,7 +72,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">
-                  Professional and Researched Based Verical Training
+                  Professional and Researched Based Vertical Jump Training
                 </h2>
                 <p className="max-w-[900px] text-gray-200 md:text-xl/relaxed">
                   VPD provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
