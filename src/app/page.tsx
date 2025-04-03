@@ -11,13 +11,6 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
         <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <Image
-              src="/placeholder.svg?height=32&width=32"
-              width={32}
-              height={32}
-              alt="VPD Logo"
-              className="rounded"
-            />
             <span className="text-xl font-bold text-blue-400">VPD</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -51,11 +44,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center max-w-3xl mx-auto">
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none text-white">
-                  Elevate Your Volleyball Performance
+                  Elevate Your Vertical Jump
                 </h1>
                 <p className="max-w-[600px] text-gray-200 md:text-xl mx-auto">
-                  VPD offers personalized volleyball training programs designed to take your skills to the next level
-                  with expert coaching and proven development methods.
+                  VPD offers personalized week to week training tailored to each athlete's needs and goals to transform their vertical to the next level. 
                 </p>
                 <div className="pt-4">
                   <Button
@@ -63,7 +55,7 @@ export default function Home() {
                     className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90 px-20 min-w-[300px]"
                     asChild
                   >
-                    <Link href="/signup">Join Our Program</Link>
+                    <Link href="/signup">Your Vertical Jump Transformation Starts Here</Link>
                   </Button>
                 </div>
               </div>
@@ -80,11 +72,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">
-                  Professional Volleyball Development Training
+                  Professional and Researched Based Verical Training
                 </h2>
                 <p className="max-w-[900px] text-gray-200 md:text-xl/relaxed">
-                  VPD provides personalized training programs tailored to your specific position, skill level, and
-                  goals.
+                  VPD provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
                 </p>
               </div>
             </div>
@@ -96,7 +87,7 @@ export default function Home() {
                   </div>
                   <CardTitle className="text-white">Personalized Training</CardTitle>
                   <CardDescription className="text-gray-200">
-                    Custom training plans tailored to your position, skill level, and performance goals.
+                    Custom training plans tailored to your training history, available equipment, and time.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -107,7 +98,7 @@ export default function Home() {
                   </div>
                   <CardTitle className="text-white">Consistent Schedule</CardTitle>
                   <CardDescription className="text-gray-200">
-                    Regular training sessions with clear objectives and progression paths.
+                    Training is written out week by week, incorpating feedback from the athletes and making adjustments as needed.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -127,9 +118,9 @@ export default function Home() {
                   <div className="mx-auto w-16 h-16 rounded-full border border-blue-500 bg-gradient-to-b from-gray-800 to-black flex items-center justify-center mb-2">
                     <Clock className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-white">Efficient Training</CardTitle>
+                  <CardTitle className="text-white">Researched Based</CardTitle>
                   <CardDescription className="text-gray-200">
-                    Focused sessions that maximize improvement in minimal time with proven techniques.
+                    Utilize the most backed up training methods from peer reviewed articles and tested by us coaches.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -138,9 +129,9 @@ export default function Home() {
                   <div className="mx-auto w-16 h-16 rounded-full border border-blue-500 bg-gradient-to-b from-gray-800 to-black flex items-center justify-center mb-2">
                     <Users className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-white">Group & Individual</CardTitle>
+                  <CardTitle className="text-white">Consistent feedback and support from coaches</CardTitle>
                   <CardDescription className="text-gray-200">
-                    Balance of team-based training and individual skill development sessions.
+                    Guaranteed quick responses to any questions or concerns from our coaches as well as weekly phone call check ins.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -149,9 +140,9 @@ export default function Home() {
                   <div className="mx-auto w-16 h-16 rounded-full border border-blue-500 bg-gradient-to-b from-gray-800 to-black flex items-center justify-center mb-2">
                     <Award className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-white">Achievement System</CardTitle>
+                  <CardTitle className="text-white">Injury Rehab and Prevention</CardTitle>
                   <CardDescription className="text-gray-200">
-                    Motivational milestones and recognition to celebrate your progress and improvements.
+                    We will rehab your knee pain and make you become a more resilent athlete. 
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -165,28 +156,63 @@ export default function Home() {
         {/* About Us Section */}
         <section id="about" className="w-full py-12 md:py-24 lg:py-32 bg-neutral-950">
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-start">
               <div className="space-y-4">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">
-                  About Volleyball Performance Development
+                  About VDP
                 </h2>
                 <p className="text-gray-200 md:text-lg">
-                  Founded by professional volleyball players and certified coaches, VPD was created with a singular
-                  mission: to provide athletes with the highest quality volleyball training available.
+                  Hi there! I'm Coach Haseeb and I have been training for 5+ years, vertical jump training for 4+ years, and coaching volleyball for 2+ years. I transformed my vertical from not even being able to touch rim to a 37-38 inch vertical purely through training and research. I love training and have a passion for helping athletes reach their full potential, VPD was created to be an more affordable option for athletes willing to put in the hard work to increase their vertical.
                 </p>
                 <p className="text-gray-200 md:text-lg">
-                  Our team combines decades of competitive experience with cutting-edge training methodologies to
-                  develop programs that deliver measurable results. We understand the unique demands of the sport and
-                  tailor our approach to each athlete's specific needs.
+                  VDP was created by me because of a problem I had with other vertical jump programs. They are too expensive! I'm talking about the good ones like THP Strength, not the ones that are just super generic and outdated. I say this because I was once a THP athlete myself paying upwards of $50 a month for a training methodologies that I had already been applying to myself (P.S that was on a discount, their regular price was over $100 a month!)
                 </p>
                 <p className="text-gray-200 md:text-lg">
-                  Whether you're looking to earn a college scholarship, improve your club team performance, or simply
-                  become the best player you can be, our structured development programs will help you reach your goals.
+                  But the main issue lies in the fact that the training was not personalized to the athlete and I was just simply not getting responses to my questions on a timely matter, it felt like I was just a number to them. I've been there, done that, and I'm here to tell you that here at VDP we take great care of our clients. This is a guarantee because unlike these other programs which are big businesses, VDP has much less clients meaning we can give you the attention you deserve.
                 </p>
+                <ul className="text-gray-200 md:text-lg">
+                  <li>Below are my stats as an athlete:</li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> Vertical Jump: 38 inch
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> Squat: 355LB
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> Deadlift: 385LB
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> Bench Press: 250LB
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> Power Clean: 215LB
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> Volleyball at SJSU D1 team
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2 text-white">•</span> 162LB with less than 12% body fat
+                  </li>
+                </ul>
               </div>
-              <div className="relative h-[400px] overflow-hidden rounded-lg border border-blue-500">
-                <div className="absolute inset-0 flex items-center justify-center bg-neutral-900 text-gray-400">
-                  <p className="text-center">Team Image</p>
+              <div className="space-y-6">
+                <div className="relative h-auto aspect-[4/3] overflow-hidden rounded-lg border border-blue-500">
+                  <Image
+                    src="/images/jump.png"
+                    alt="Volleyball jump demonstration"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="relative h-auto aspect-[2/3] overflow-hidden rounded-lg border border-blue-500">
+                  <Image
+                    src="/images/buff.png"
+                    alt="Physique demonstration"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-lg"
+                  />
                 </div>
               </div>
             </div>
@@ -213,21 +239,13 @@ export default function Home() {
               <Card className="bg-neutral-950 border border-blue-500">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <Image
-                      src="/placeholder.svg?height=60&width=60"
-                      width={60}
-                      height={60}
-                      alt="Emma"
-                      className="rounded-full"
-                    />
+                
                     <div>
                       <p className="mb-2 italic text-gray-200">
-                        "The personalized training program from VPD has transformed my game. I've improved my vertical
-                        jump by 4 inches and my hitting accuracy has made me a go-to player on my team. The coach's
-                        attention to detail is incredible."
+                        "VDP and Coach Haseeb have been a game changer for me. I've improved my vertical jump by 4 inches and my hitting power has increased. His attention to detail as well as being able to push me in my training helped me become more prepared for my D1 volleyball season."
                       </p>
-                      <p className="font-semibold text-white">Emma Chen</p>
-                      <p className="text-sm text-gray-300">Outside Hitter, High School Senior</p>
+                      <p className="font-semibold text-white">Charles Carroll</p>
+                      <p className="text-sm text-gray-300">D1 Outside Hitter at St. Thomas Aquinas</p>
                     </div>
                   </div>
                 </CardContent>
@@ -235,21 +253,13 @@ export default function Home() {
               <Card className="bg-neutral-950 border border-blue-500">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <Image
-                      src="/placeholder.svg?height=60&width=60"
-                      width={60}
-                      height={60}
-                      alt="Marcus"
-                      className="rounded-full"
-                    />
+                    
                     <div>
                       <p className="mb-2 italic text-gray-200">
-                        "As a libero, I needed specialized training to improve my defensive skills. VPD created a
-                        program that focused on my reaction time and court positioning. After 3 months, my coach noticed
-                        a huge difference in my game awareness."
+                        "As a teamate of Haseeb in college volleyball, he was always the one that was able to jump higher than everyone else. I knew he had a secret to his success and now I know what it is. Its all the vertical jump training he has been doing the past 4 years, being able to talk to him about what type of training he has done and compare to my own gives me reassurance he knows what he is doing."
                       </p>
-                      <p className="font-semibold text-white">Marcus Johnson</p>
-                      <p className="text-sm text-gray-300">Libero, Club Volleyball</p>
+                      <p className="font-semibold text-white">Dylan Lau</p>
+                      <p className="text-sm text-gray-300">Outside Hitter/Volleyball Coach, SJSU D1 Volleyball </p>
                     </div>
                   </div>
                 </CardContent>
@@ -279,27 +289,27 @@ export default function Home() {
                 <CardHeader>
                   <CardTitle className="text-white">Basic</CardTitle>
                   <div className="text-3xl font-bold text-white">
-                    $10<span className="text-sm font-normal text-gray-300">/month</span>
+                    $8<span className="text-sm font-normal text-gray-300">/month</span>
                   </div>
-                  <CardDescription className="text-gray-200">Perfect for beginners</CardDescription>
+                  <CardDescription className="text-gray-200">Perfect for all</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">1 training session per week</span>
+                      <span className="text-gray-200">Customized week to week training</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">Basic skill development</span>
+                      <span className="text-gray-200">Group Chat with coaches for questions and form review</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">Monthly progress tracking</span>
+                      <span className="text-gray-200">Daily progress tracking</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">Access to client portal</span>
+                      <span className="text-gray-200">Nutrition guidance</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -317,7 +327,7 @@ export default function Home() {
                   <div className="text-center text-sm font-medium text-blue-400 mb-2">MOST POPULAR</div>
                   <CardTitle className="text-white">Performance</CardTitle>
                   <div className="text-3xl font-bold text-white">
-                    $15<span className="text-sm font-normal text-gray-300">/month</span>
+                    $10<span className="text-sm font-normal text-gray-300">/month</span>
                   </div>
                   <CardDescription className="text-gray-200">For dedicated athletes</CardDescription>
                 </CardHeader>
@@ -325,23 +335,23 @@ export default function Home() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">2 training sessions per week</span>
+                      <span className="text-gray-200">Customized week to week training</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">Advanced skill development</span>
+                      <span className="text-gray-200">Group Chat as well as weekly one on one calls with coaches</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">Bi-weekly progress tracking</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-200">Video analysis feedback</span>
+                      <span className="text-gray-200">Daily Progess Tracking</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-blue-400" />
                       <span className="text-gray-200">Nutrition guidance</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-7 w-7 text-blue-400" />
+                      <span className="text-gray-200">3 inches of vertical jump increase guaranteed within 3 months or you get trained for free until you hit that goal</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -363,13 +373,6 @@ export default function Home() {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Image
-                  src="/placeholder.svg?height=32&width=32"
-                  width={32}
-                  height={32}
-                  alt="VPD Logo"
-                  className="rounded"
-                />
                 <span className="text-xl font-bold text-blue-400">VPD</span>
               </div>
               <p className="text-sm text-gray-300">
@@ -381,24 +384,16 @@ export default function Home() {
               <h3 className="text-sm font-medium text-white">Program</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="#program" className="text-gray-300 hover:text-blue-400">
-                    Training Approach
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Training Approach</span>
                 </li>
                 <li>
-                  <Link href="#pricing" className="text-gray-300 hover:text-blue-400">
-                    Pricing
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Pricing</span>
                 </li>
                 <li>
-                  <Link href="/faq" className="text-gray-300 hover:text-blue-400">
-                    FAQ
-                  </Link>
+                  <span className="text-gray-300 cursor-default">FAQ</span>
                 </li>
                 <li>
-                  <Link href="/locations" className="text-gray-300 hover:text-blue-400">
-                    Training Locations
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Training Locations</span>
                 </li>
               </ul>
             </div>
@@ -406,24 +401,16 @@ export default function Home() {
               <h3 className="text-sm font-medium text-white">Resources</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/blog" className="text-gray-300 hover:text-blue-400">
-                    Blog
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Blog</span>
                 </li>
                 <li>
-                  <Link href="/guides" className="text-gray-300 hover:text-blue-400">
-                    Training Tips
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Training Tips</span>
                 </li>
                 <li>
-                  <Link href="/nutrition" className="text-gray-300 hover:text-blue-400">
-                    Nutrition Guide
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Nutrition Guide</span>
                 </li>
                 <li>
-                  <Link href="/videos" className="text-gray-300 hover:text-blue-400">
-                    Training Videos
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Training Videos</span>
                 </li>
               </ul>
             </div>
@@ -431,24 +418,16 @@ export default function Home() {
               <h3 className="text-sm font-medium text-white">Contact</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/about" className="text-gray-300 hover:text-blue-400">
-                    About Us
-                  </Link>
+                  <span className="text-gray-300 cursor-default">About Us</span>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-gray-300 hover:text-blue-400">
-                    Contact
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Contact</span>
                 </li>
                 <li>
-                  <Link href="/privacy" className="text-gray-300 hover:text-blue-400">
-                    Privacy Policy
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Privacy Policy</span>
                 </li>
                 <li>
-                  <Link href="/terms" className="text-gray-300 hover:text-blue-400">
-                    Terms of Service
-                  </Link>
+                  <span className="text-gray-300 cursor-default">Terms of Service</span>
                 </li>
               </ul>
             </div>
@@ -458,7 +437,7 @@ export default function Home() {
               © {new Date().getFullYear()} Volleyball Performance Development. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <Link href="#" className="text-gray-300 hover:text-blue-400">
+              <span className="text-gray-300 cursor-default">
                 <span className="sr-only">Twitter</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -474,8 +453,8 @@ export default function Home() {
                 >
                   <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
                 </svg>
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-blue-400">
+              </span>
+              <span className="text-gray-300 cursor-default">
                 <span className="sr-only">Instagram</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -493,8 +472,8 @@ export default function Home() {
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                   <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
                 </svg>
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-blue-400">
+              </span>
+              <span className="text-gray-300 cursor-default">
                 <span className="sr-only">Facebook</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -510,8 +489,8 @@ export default function Home() {
                 >
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                 </svg>
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-blue-400">
+              </span>
+              <span className="text-gray-300 cursor-default">
                 <span className="sr-only">YouTube</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -528,7 +507,7 @@ export default function Home() {
                   <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
                   <path d="m10 15 5-3-5-3z" />
                 </svg>
-              </Link>
+              </span>
             </div>
           </div>
         </div>
