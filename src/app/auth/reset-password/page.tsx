@@ -1,46 +1,46 @@
 "use client"
 import { createClientClient } from "@/utils/supabase/client";
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
 
-export default function Signup() {
+export default function ResetPassword() {
   const supabase = createClientClient();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     password: "",
     confirmPassword: "",
-    plan: "basic",
-    termsAccepted: false
   })
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: type === 'checkbox' ? checked : value
-    }));
-  }
+  useEffect(() => {
+    // Check if we have a session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Invalid or expired reset link");
+        router.push("/login");
+      }
+    };
 
-  const handleRadioChange = (value: string) => {
+    checkSession();
+  }, [supabase, router]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      plan: value
+      [id]: value
     }));
   }
 
@@ -58,35 +58,22 @@ export default function Signup() {
       return;
     }
     
-    if (!formData.termsAccepted) {
-      toast.error("You must accept the terms and conditions");
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
-      // Sign up with Supabase
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.name,
-            plan: formData.plan
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
+      // Update password
+      const { error } = await supabase.auth.updateUser({
+        password: formData.password
       });
       
       if (error) {
         throw error;
       }
       
-      toast.success("Signup successful! Please check your email to confirm your account.");
+      toast.success("Password updated successfully!");
       router.push("/login");
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during signup");
+      toast.error(error.message || "An error occurred while updating your password");
     } finally {
       setIsLoading(false);
     }
@@ -122,43 +109,15 @@ export default function Signup() {
         <div className="w-full max-w-md">
           <Card className="bg-neutral-950 border border-blue-500">
             <CardHeader>
-              <CardTitle className="text-2xl text-white">Create an Account</CardTitle>
-              <CardDescription className="text-gray-300">Join our volleyball training program</CardDescription>
+              <CardTitle className="text-2xl text-white">Reset Your Password</CardTitle>
+              <CardDescription className="text-gray-300">Create a new password for your account</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit}>
                 <div className="grid gap-6">
                   <div className="grid gap-3">
-                    <Label htmlFor="name" className="text-gray-200">
-                      Full Name
-                    </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="John Doe"
-                      className="bg-neutral-900 border-neutral-800 text-white"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="email" className="text-gray-200">
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="name@example.com"
-                      className="bg-neutral-900 border-neutral-800 text-white"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="grid gap-3">
                     <Label htmlFor="password" className="text-gray-200">
-                      Password
+                      New Password
                     </Label>
                     <div className="relative">
                       <Input
@@ -184,7 +143,7 @@ export default function Signup() {
                   </div>
                   <div className="grid gap-3">
                     <Label htmlFor="confirmPassword" className="text-gray-200">
-                      Confirm Password
+                      Confirm New Password
                     </Label>
                     <div className="relative">
                       <Input
@@ -207,51 +166,6 @@ export default function Signup() {
                       </div>
                     </div>
                   </div>
-                  <div className="grid gap-3">
-                    <Label className="text-gray-200">Select Your Plan</Label>
-                    <RadioGroup 
-                      defaultValue="basic" 
-                      onValueChange={handleRadioChange}
-                    >
-                      <div className="flex items-center space-x-2 mb-2">
-                        <RadioGroupItem value="basic" id="basic" className="border-neutral-700 text-blue-500" />
-                        <Label htmlFor="basic" className="text-gray-200">
-                          Basic - $10/month
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value="performance"
-                          id="performance"
-                          className="border-neutral-700 text-blue-500"
-                        />
-                        <Label htmlFor="performance" className="text-gray-200">
-                          Performance - $15/month
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="termsAccepted" 
-                      className="border-neutral-700 data-[state=checked]:bg-blue-500" 
-                      required 
-                      checked={formData.termsAccepted}
-                      onCheckedChange={(checked) => 
-                        setFormData(prev => ({ ...prev, termsAccepted: checked as boolean }))
-                      }
-                    />
-                    <Label htmlFor="termsAccepted" className="text-sm text-gray-300">
-                      I agree to the{" "}
-                      <Link href="/terms" className="text-blue-400 hover:underline">
-                        Terms of Service
-                      </Link>{" "}
-                      and{" "}
-                      <Link href="/privacy" className="text-blue-400 hover:underline">
-                        Privacy Policy
-                      </Link>
-                    </Label>
-                  </div>
                 </div>
                 <CardFooter className="flex flex-col gap-4 px-0 pt-6">
                   <Button 
@@ -259,12 +173,12 @@ export default function Signup() {
                     className="w-full bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Creating Account..." : "Create Account"}
+                    {isLoading ? "Updating Password..." : "Update Password"}
                   </Button>
                   <p className="text-sm text-gray-300 text-center">
-                    Already have an account?{" "}
+                    Remember your password?{" "}
                     <Link href="/login" className="text-blue-400 hover:underline">
-                      Log in
+                      Sign in
                     </Link>
                   </p>
                 </CardFooter>
@@ -275,4 +189,4 @@ export default function Signup() {
       </main>
     </div>
   )
-}
+} 
