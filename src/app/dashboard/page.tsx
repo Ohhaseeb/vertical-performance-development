@@ -21,6 +21,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { getUser } from "@/queries/user"
 
 interface Exercise {
   id: number
@@ -92,30 +93,20 @@ export default function DashboardPage() {
   const [showAllDays, setShowAllDays] = useState(false);
 
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        if (error) {
-          throw error;
-        }
-        
-        if (!user) {
-          router.push('/login');
-          return;
-        }
-        
-        setUser(user);
-      } catch (error) {
-        console.error("Error fetching user:", error);
+    const fetchUser = async () => {
+      const { user: userData, error } = await getUser();
+      
+      if (error || !userData) {
         router.push('/login');
-      } finally {
-        setLoading(false);
+        return;
       }
+      
+      setUser(userData);
+      setLoading(false);
     };
 
-    getUser();
-  }, [supabase, router]);
+    fetchUser();
+  }, [router]);
 
   const handleSignOut = async () => {
     try {
