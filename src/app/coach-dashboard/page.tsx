@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   Users,
@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
+import { createClientClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
+import { getUser } from "@/queries/user"
 
 // Mock data for users
 const mockUsers = [
@@ -72,12 +75,75 @@ const mockUsers = [
 
 export default function CoachDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const supabase = createClientClient();
+
+  useEffect(() => {
+    const checkAdminAccess = async () => {
+      try {
+        const { user: userData, error } = await getUser();
+        
+        if (error || !userData) {
+          console.error('Authentication error:', error);
+          router.push('/login');
+          return;
+        }
+
+        // Check admin status from profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('admin')
+          .eq('id', userData.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error checking admin status:', profileError);
+          router.push('/login');
+          return;
+        }
+
+        // If user is not admin, redirect to regular dashboard
+        if (!profileData?.admin) {
+          router.push('/dashboard');
+          return;
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Unexpected error:', error);
+        router.push('/login');
+      }
+    };
+
+    checkAdminAccess();
+  }, [router]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white">Loading Coach Dashboard...</h1>
+        </div>
+      </div>
+    );
+  }
 
   const filteredUsers = mockUsers.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.user_metadata?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesSearch
   })
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/');
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-black dark">
@@ -105,6 +171,7 @@ export default function CoachDashboardPage() {
                 variant="ghost" 
                 size="icon" 
                 className="text-gray-200 hover:text-blue-400"
+                onClick={handleSignOut}
               >
                 <LogOut className="h-5 w-5" />
                 <span className="sr-only">Log out</span>

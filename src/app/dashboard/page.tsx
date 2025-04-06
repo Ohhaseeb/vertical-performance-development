@@ -94,15 +94,40 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { user: userData, error } = await getUser();
-      
-      if (error || !userData) {
+      try {
+        const { user: userData, error } = await getUser();
+        
+        if (error || !userData) {
+          console.error('Authentication error:', error);
+          router.push('/login');
+          return;
+        }
+
+        // Check admin status from profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('admin')
+          .eq('id', userData.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error checking admin status:', profileError);
+          router.push('/login');
+          return;
+        }
+
+        // Explicit check for admin status
+        if (profileData && profileData.admin === true) {
+          router.push('/coach-dashboard');
+          return;
+        }
+        
+        setUser(userData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Unexpected error:', error);
         router.push('/login');
-        return;
       }
-      
-      setUser(userData);
-      setLoading(false);
     };
 
     fetchUser();
@@ -117,6 +142,7 @@ export default function DashboardPage() {
     }
   };
 
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -129,6 +155,7 @@ export default function DashboardPage() {
 
   const userFirstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Athlete';
 
+  
   return (
     <div className="flex min-h-screen flex-col bg-black dark">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
