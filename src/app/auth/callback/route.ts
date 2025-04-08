@@ -1,4 +1,5 @@
-import { createServerClient } from '@/utils/supabase/server';
+//import { createServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
@@ -8,8 +9,9 @@ export async function GET(request: Request) {
 
   if (code) {
     const cookieStore = cookies();
-    const supabase = createServerClient();
-    
+    //const supabase = createServerClient();
+    const supabase = await createClient();
+
     // Exchange the code for a session
     await supabase.auth.exchangeCodeForSession(code);
   }

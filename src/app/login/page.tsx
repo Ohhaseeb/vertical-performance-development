@@ -1,11 +1,11 @@
 "use client"
 
+import { login } from './actions'
 import { createClientClient } from "@/utils/supabase/client";
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 export default function Login() {
   const supabase = createClientClient();
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -32,28 +31,13 @@ export default function Login() {
     }));
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
-    
-    try {
-      // Sign in with Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      toast.success("Login successful!");
-      router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred during login");
-    } finally {
-      setIsLoading(false);
+    const result = await login(formData);
+    if (result?.error) {
+      toast.error(result.error);
     }
+    setIsLoading(false);
   }
 
   const handleForgotPassword = async () => {
@@ -115,7 +99,7 @@ export default function Login() {
               <CardDescription className="text-gray-300">Sign in to your account</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit}>
+              <form action={handleSubmit}>
                 <div className="grid gap-6">
                   <div className="grid gap-3">
                     <Label htmlFor="email" className="text-gray-200">
@@ -123,6 +107,7 @@ export default function Login() {
                     </Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="name@example.com"
                       className="bg-neutral-900 border-neutral-800 text-white"
@@ -132,22 +117,13 @@ export default function Login() {
                     />
                   </div>
                   <div className="grid gap-3">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-gray-200">
-                        Password
-                      </Label>
-                      <button
-                        type="button"
-                        onClick={handleForgotPassword}
-                        className="text-sm text-blue-400 hover:underline"
-                        disabled={isLoading}
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
+                    <Label htmlFor="password" className="text-gray-200">
+                      Password
+                    </Label>
                     <div className="relative">
                       <Input
                         id="password"
+                        name="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         className="bg-neutral-900 border-neutral-800 text-white pr-10"
@@ -173,6 +149,14 @@ export default function Login() {
                         Remember me
                       </Label>
                     </div>
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="text-sm text-blue-400 hover:underline"
+                      disabled={isLoading}
+                    >
+                      Forgot password?
+                    </button>
                   </div>
                 </div>
                 <CardFooter className="flex flex-col gap-4 px-0 pt-6">

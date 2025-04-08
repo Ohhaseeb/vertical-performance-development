@@ -1,10 +1,10 @@
 "use client"
-import { createClientClient } from "@/utils/supabase/client";
+
+import { signup } from './actions'
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff } from "lucide-react"
-import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,11 +12,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
 
 export default function Signup() {
-  const supabase = createClientClient();
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -44,54 +41,6 @@ export default function Signup() {
     }));
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate form
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    
-    if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
-      return;
-    }
-    
-    if (!formData.termsAccepted) {
-      toast.error("You must accept the terms and conditions");
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      // Sign up with Supabase
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.name,
-            plan: formData.plan
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      toast.success("Signup successful! Please check your email to confirm your account.");
-      router.push("/login");
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred during signup");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-900 to-black">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
@@ -99,7 +48,6 @@ export default function Signup() {
           <div className="flex items-center gap-2">
             <Link href="/">
               <div className="flex items-center gap-2">
-             
                 <span className="text-xl font-bold text-blue-400">VPD</span>
               </div>
             </Link>
@@ -120,7 +68,7 @@ export default function Signup() {
               <CardDescription className="text-gray-300">Join our volleyball training program</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit}>
+              <form action={signup}>
                 <div className="grid gap-6">
                   <div className="grid gap-3">
                     <Label htmlFor="name" className="text-gray-200">
@@ -128,6 +76,7 @@ export default function Signup() {
                     </Label>
                     <Input
                       id="name"
+                      name="name"
                       type="text"
                       placeholder="John Doe"
                       className="bg-neutral-900 border-neutral-800 text-white"
@@ -142,6 +91,7 @@ export default function Signup() {
                     </Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="name@example.com"
                       className="bg-neutral-900 border-neutral-800 text-white"
@@ -157,6 +107,7 @@ export default function Signup() {
                     <div className="relative">
                       <Input
                         id="password"
+                        name="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         className="bg-neutral-900 border-neutral-800 text-white pr-10"
