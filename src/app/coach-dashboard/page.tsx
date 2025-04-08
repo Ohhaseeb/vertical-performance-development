@@ -80,32 +80,13 @@ export default function CoachDashboardPage() {
   const supabase = createClientClient();
 
   useEffect(() => {
-    const checkAdminAccess = async () => {
+    const fetchUser = async () => {
       try {
         const { user: userData, error } = await getUser();
         
         if (error || !userData) {
           console.error('Authentication error:', error);
           router.push('/login');
-          return;
-        }
-
-        // Check admin status from profiles table
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('admin')
-          .eq('id', userData.id)
-          .single();
-
-        if (profileError) {
-          console.error('Error checking admin status:', profileError);
-          router.push('/login');
-          return;
-        }
-
-        // If user is not admin, redirect to regular dashboard
-        if (!profileData?.admin) {
-          router.push('/dashboard');
           return;
         }
 
@@ -116,7 +97,7 @@ export default function CoachDashboardPage() {
       }
     };
 
-    checkAdminAccess();
+    fetchUser();
   }, [router]);
 
   // Show loading state
