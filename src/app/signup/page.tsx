@@ -25,13 +25,33 @@ export default function Signup() {
     plan: "basic",
     termsAccepted: false
   })
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    termsAccepted?: string;
+  }>({});
 
+  // Handle input change from form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type, checked } = e.target;
+    
+    // Basic sanitization - trim whitespace
+    const sanitizedValue = type === 'checkbox' ? checked : value.trim();
+    
     setFormData(prev => ({
       ...prev,
-      [id]: type === 'checkbox' ? checked : value
+      [id]: sanitizedValue
     }));
+    
+    // Clear error when field is edited
+    if (errors[id as keyof typeof errors]) {
+      setErrors(prev => ({
+        ...prev,
+        [id]: undefined
+      }));
+    }
   }
 
   const handleRadioChange = (value: string) => {
@@ -41,6 +61,91 @@ export default function Signup() {
     }));
   }
 
+  // Validate form data
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+    
+    // Name validation - only letters, spaces, and common name characters
+    if (!formData.name) {
+      newErrors.name = "Name is required";
+    } else if (!/^[A-Za-z\s.',-]{2,50}$/.test(formData.name)) {
+      newErrors.name = "Name appears to be invalid";
+    }
+    
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = "Password must include uppercase, lowercase, and numbers";
+    }
+    
+    // Confirm password validation
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    
+    // Terms acceptance
+    if (!formData.termsAccepted) {
+      newErrors.termsAccepted = "You must accept the terms";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Create sanitized FormData for submission
+      const formDataToSubmit = new FormData();
+      
+      // Sanitize name - remove excessive spaces, escape HTML
+      formDataToSubmit.append('name', 
+        formData.name
+          .replace(/\s+/g, ' ')
+          .replace(/[<>&"']/g, c => {
+            return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c] || c;
+          })
+      );
+      
+      // Email - normalize to lowercase
+      formDataToSubmit.append('email', formData.email.toLowerCase());
+      
+      // Don't sanitize password - it needs to be exact as entered
+      formDataToSubmit.append('password', formData.password);
+      
+      // Add plan
+      formDataToSubmit.append('plan', formData.plan);
+      
+      // Submit the sanitized data
+      await signup(formDataToSubmit);
+    } catch (error) {
+      console.error('Signup error:', error);
+      // Handle submission errors if needed
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Render the signup page
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-900 to-black">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
@@ -68,11 +173,11 @@ export default function Signup() {
               <CardDescription className="text-gray-300">Join our volleyball training program</CardDescription>
             </CardHeader>
             <CardContent>
-              <form action={signup}>
+              <form onSubmit={handleSubmit}>
                 <div className="grid gap-6">
                   <div className="grid gap-3">
                     <Label htmlFor="name" className="text-gray-200">
-                      Full Name
+                      First Name
                     </Label>
                     <Input
                       id="name"
@@ -84,6 +189,7 @@ export default function Signup() {
                       value={formData.name}
                       onChange={handleInputChange}
                     />
+                    {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
                   </div>
                   <div className="grid gap-3">
                     <Label htmlFor="email" className="text-gray-200">
@@ -99,6 +205,7 @@ export default function Signup() {
                       value={formData.email}
                       onChange={handleInputChange}
                     />
+                    {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                   </div>
                   <div className="grid gap-3">
                     <Label htmlFor="password" className="text-gray-200">
@@ -125,7 +232,11 @@ export default function Signup() {
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-400">Password must be at least 8 characters long</p>
+                    {errors.password ? (
+                      <p className="text-xs text-red-500">{errors.password}</p>
+                    ) : (
+                      <p className="text-xs text-gray-400">Password must be at least 8 characters long</p>
+                    )}
                   </div>
                   <div className="grid gap-3">
                     <Label htmlFor="confirmPassword" className="text-gray-200">
@@ -151,6 +262,7 @@ export default function Signup() {
                         </button>
                       </div>
                     </div>
+                    {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
                   </div>
                   <div className="grid gap-3">
                     <Label className="text-gray-200">Select Your Plan</Label>
@@ -196,6 +308,7 @@ export default function Signup() {
                         Privacy Policy
                       </Link>
                     </Label>
+                    {errors.termsAccepted && <p className="text-xs text-red-500 ml-2">{errors.termsAccepted}</p>}
                   </div>
                 </div>
                 <CardFooter className="flex flex-col gap-4 px-0 pt-6">
