@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 
+// Server action for signup
 export async function signup(formData: FormData) {
     const supabase = await createClient()
   
@@ -24,5 +25,5 @@ export async function signup(formData: FormData) {
     const { error } = await supabase.auth.signUp(data)
   
     revalidatePath('/', 'layout')
-    redirect('/login')
+    
   }
