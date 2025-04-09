@@ -19,101 +19,53 @@ import { createClientClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
 import { getUser } from "@/queries/user"
 
-// Mock data for users
-const mockUsers = [
-  {
-    id: "1",
-    email: "john.doe@example.com",
-    user_metadata: {
-      full_name: "John Doe",
-      role: "athlete",
-      position: "Outside Hitter"
-    },
-    last_sign_in_at: "2024-04-01T10:00:00Z"
-  },
-  {
-    id: "2",
-    email: "jane.smith@example.com",
-    user_metadata: {
-      full_name: "Jane Smith",
-      role: "athlete",
-      position: "Middle Blocker"
-    },
-    last_sign_in_at: "2024-04-02T15:30:00Z"
-  },
-  {
-    id: "3",
-    email: "mike.johnson@example.com",
-    user_metadata: {
-      full_name: "Mike Johnson",
-      role: "athlete",
-      position: "Setter"
-    },
-    last_sign_in_at: "2024-04-03T09:15:00Z"
-  },
-  {
-    id: "4",
-    email: "sarah.williams@example.com",
-    user_metadata: {
-      full_name: "Sarah Williams",
-      role: "athlete",
-      position: "Libero"
-    },
-    last_sign_in_at: "2024-04-04T14:20:00Z"
-  },
-  {
-    id: "5",
-    email: "david.brown@example.com",
-    user_metadata: {
-      full_name: "David Brown",
-      role: "athlete",
-      position: "Opposite Hitter"
-    },
-    last_sign_in_at: "2024-04-05T11:45:00Z"
-  }
-]
+interface Profile {
+  id: string;
+  email: string;
+  first_name: string;
+  plan: string;
+  admin: boolean;
+}
 
 export default function CoachDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState<Profile[]>([])
   const router = useRouter();
   const supabase = createClientClient();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchProfiles = async () => {
       try {
-        const { user: userData, error } = await getUser();
         
-        if (error || !userData) {
-          console.error('Authentication error:', error);
-          router.push('/login');
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*');
+        
+        if (error) {
+          console.error('Error fetching profiles:', error);
           return;
         }
-
+        
+        
+        
+        if (data) {
+          setUsers(data);
+         
+        }
         setLoading(false);
       } catch (error) {
         console.error('Unexpected error:', error);
-        router.push('/login');
+        setLoading(false);
       }
     };
 
-    fetchUser();
-  }, [router]);
+    fetchProfiles();
+  }, []);
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white">Loading Coach Dashboard...</h1>
-        </div>
-      </div>
-    );
-  }
-
-  const filteredUsers = mockUsers.filter(user => {
+  const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.user_metadata?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      user.first_name?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesSearch
   })
 
@@ -125,6 +77,16 @@ export default function CoachDashboardPage() {
       console.error("Error signing out:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white">Loading Athletes...</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-black dark">
@@ -193,17 +155,17 @@ export default function CoachDashboardPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-12 w-12 border border-blue-500">
-                        <AvatarImage src="/placeholder.svg" alt={user.user_metadata?.full_name || "User"} />
+                        <AvatarImage src="/placeholder.svg" alt={user.first_name || "User"} />
                         <AvatarFallback className="bg-neutral-800 text-blue-400">
-                          {user.user_metadata?.full_name?.substring(0, 2).toUpperCase() || "U"}
+                          {user.first_name?.substring(0, 2).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <CardTitle className="text-white">
-                          {user.user_metadata?.full_name || "Unnamed User"}
+                          {user.first_name.toUpperCase() || "Unnamed User"}
                         </CardTitle>
                         <CardDescription className="text-gray-300">
-                          {user.user_metadata?.role || "No role assigned"}
+                          athlete
                         </CardDescription>
                       </div>
                     </div>
@@ -215,14 +177,12 @@ export default function CoachDashboardPage() {
                         <span className="text-white">{user.email}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Position</span>
-                        <span className="text-white">{user.user_metadata?.position || "Not specified"}</span>
+                        <span className="text-gray-400">Plan</span>
+                        <span className="text-white">{user.plan}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Last Active</span>
-                        <span className="text-white">
-                          {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : "Never"}
-                        </span>
+                        <span className="text-gray-400">Role</span>
+                        <span className="text-white">{user.admin ? 'Admin' : 'Athlete'}</span>
                       </div>
                     </div>
                   </CardContent>

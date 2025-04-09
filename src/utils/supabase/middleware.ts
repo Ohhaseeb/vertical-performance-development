@@ -55,7 +55,7 @@ export async function updateSession(request: NextRequest) {
   // If user is logged in, check their role and handle dashboard routing
   if (user) {
     console.log('User is logged in, checking role')
-    const isAdmin = user.role === 'admin'
+    const isAdmin = user.email === 'haseebsayed960@gmail.com'
     const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard')
     const isOnCoachDashboard = request.nextUrl.pathname.startsWith('/coach-dashboard')
 
