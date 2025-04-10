@@ -14,37 +14,11 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-interface Profile {
-  id: string;
-  email: string;
-  first_name: string;
-  plan: string;
-  admin: boolean;
-}
+import { Profile, getAthleteById, getAllAthletes } from "@/queries/athlete"
+import { Exercise, getAllExercises, addExercise } from "@/queries/exercises"
+import { TrainingPlan, TrainingPlanExercise, getTrainingPlanByDate, createTrainingPlan } from "@/queries/training"
 
-interface Exercise {
-  id: string;
-  name: string;
-}
-
-interface TrainingPlanExercise {
-  id?: string;
-  exercise_id: string;
-  sets: number;
-  reps: number;
-  notes: string;
-  exercise_name?: string;
-  exercises?: Exercise;
-}
-
-interface TrainingPlan {
-  id: string;
-  athlete_id: string;
-  date: string;
-  exercises_data: TrainingPlanExercise[];
-  created_at: string;
-}
-
+// Main page component for displaying an individual athlete's training calendar and plans
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
@@ -70,22 +44,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     notes: ""
   })
   const [planExercises, setPlanExercises] = useState<TrainingPlanExercise[]>([])
-  const [athletes, setAthletes] = useState<Profile[]>([])
 
+  // Fetches the athlete's profile data when the component mounts
   useEffect(() => {
     const fetchAthlete = async () => {
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', id)
-          .single()
-
-        if (error) {
-          console.error('Error fetching athlete:', error)
-          return
-        }
-
+        const data = await getAthleteById(supabase, id)
         setAthlete(data)
       } catch (error) {
         console.error('Error:', error)
@@ -97,46 +61,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     fetchAthlete()
   }, [id])
 
+  // Fetches training plans for the selected date
   useEffect(() => {
     const fetchTrainingPlans = async () => {
-      if (!selectedDate) return;
+      if (!selectedDate) return
       
       try {
-        const { data, error } = await supabase
-          .from('new_training_plans')
-          .select('*')
-          .eq('athlete_id', id)
-          .eq('date', format(selectedDate, 'yyyy-MM-dd'))
-          .single()
+        const data = await getTrainingPlanByDate(
+          supabase,
+          id,
+          format(selectedDate, 'yyyy-MM-dd')
+        )
         
-        if (error) {
-          
-          if (error.code === 'PGRST116') {
-            setTrainingPlans([])
-          }
-          return
-        }
-
         if (data) {
-          console.log('Fetched training plans:', data)
-          setTrainingPlans([{
-            id: data.id,
-            athlete_id: id,
-            date: format(selectedDate, 'yyyy-MM-dd'),
-            exercises_data: Array.isArray(data.exercises_data) ? data.exercises_data.map((exercise: any) => ({
-              id: exercise.id || crypto.randomUUID(),
-              exercise_id: exercise.exercise_id,
-              sets: exercise.sets,
-              reps: exercise.reps,
-              notes: exercise.notes,
-              exercise_name: exercise.exercise_name,
-              exercises: {
-                id: exercise.exercise_id,
-                name: exercise.exercise_name
-              }
-            })) : [],
-            created_at: data.created_at
-          }])
+          setTrainingPlans([data])
+        } else {
+          setTrainingPlans([])
         }
       } catch (error) {
         console.error('Error:', error)
@@ -146,22 +86,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     fetchTrainingPlans()
   }, [id, selectedDate])
 
+  // Fetches all available exercises from the database
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const { data, error } = await supabase
-          .from('exercises')
-          .select('*')
-          .order('name')
-        
-        if (error) {
-          console.error('Error fetching exercises:', error)
-          return
-        }
-
-        if (data) {
-          setExercises(data)
-        }
+        const data = await getAllExercises(supabase)
+        setExercises(data)
       } catch (error) {
         console.error('Error:', error)
       }
@@ -170,31 +100,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     fetchExercises()
   }, [])
 
-  useEffect(() => {
-    const fetchAthletes = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .neq('id', id)
-        
-        if (error) {
-          console.error('Error fetching athletes:', error)
-          return
-        }
-
-        if (data) {
-          setAthletes(data)
-        }
-      } catch (error) {
-        console.error('Error:', error)
-      }
-    }
-
-    fetchAthletes()
-  }, [id])
-
+  // Navigates to the next month in the calendar
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1))
+  
+  // Navigates to the previous month in the calendar
   const previousMonth = () => setCurrentDate(subMonths(currentDate, 1))
 
   const days = eachDayOfInterval({
@@ -202,77 +111,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     end: endOfMonth(currentDate),
   })
 
-  const handleAddTrainingPlan = async () => {
-    if (!selectedDate) return
-
-    try {
-      const { data, error } = await supabase
-        .from('new_training_plans')
-        .insert({
-          athlete_id: id,
-          date: format(selectedDate, 'yyyy-MM-dd'),
-          exercises_data: planExercises.map(exercise => ({
-            exercise_id: exercise.exercise_id,
-            sets: exercise.sets,
-            reps: exercise.reps,
-            notes: exercise.notes,
-            exercise_name: exercise.exercises?.name || exercise.exercise_name
-          }))
-        })
-        .select()
-
-      if (error) {
-        console.error('Error adding training plan:', error)
-        return
-      }
-
-      if (data) {
-        setTrainingPlans([...trainingPlans, {
-          id: data[0].id,
-          athlete_id: id,
-          date: format(selectedDate, 'yyyy-MM-dd'),
-          exercises_data: planExercises,
-          created_at: data[0].created_at
-        }])
-        setIsAddingPlan(false)
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
-  const getTrainingPlanForDate = (date: Date) => {
-    const plan = trainingPlans.find(plan => 
-      plan.date === format(date, 'yyyy-MM-dd')
-    )
-    
-    return plan
-  }
-
+  // Adds a new exercise to the database
   const handleAddNewExercise = async () => {
     if (!newExercise.trim()) return
 
     try {
-      const { data, error } = await supabase
-        .from('exercises')
-        .insert([{ name: newExercise.trim() }])
-        .select()
-
-      if (error) {
-        console.error('Error adding exercise:', error)
-        return
-      }
-
-      if (data) {
-        setExercises([...exercises, ...data])
-        setNewExercise("")
-        setIsAddingExercise(false)
-      }
+      const data = await addExercise(supabase, newExercise)
+      setExercises([...exercises, data])
+      setNewExercise("")
+      setIsAddingExercise(false)
     } catch (error) {
       console.error('Error:', error)
     }
   }
 
+  // Adds an exercise to the current training plan being created
   const handleAddExerciseToPlan = () => {
     if (!currentExercise.exercise_id || !currentExercise.sets || !currentExercise.reps) return
 
@@ -298,43 +151,31 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     })
   }
 
+  // Saves the complete training plan to the database
   const handleSaveTrainingPlan = async () => {
     if (!selectedDate || planExercises.length === 0) return
 
     try {
-      const { data: planData, error: planError } = await supabase
-        .from('new_training_plans')
-        .insert({
-          athlete_id: id,
-          date: format(selectedDate, 'yyyy-MM-dd'),
-          exercises_data: planExercises.map(exercise => ({
-            exercise_id: exercise.exercise_id,
-            sets: exercise.sets,
-            reps: exercise.reps,
-            notes: exercise.notes,
-            exercise_name: exercise.exercises?.name || exercise.exercise_name
-          }))
-        })
-        .select()
-
-      if (planError || !planData) {
-        console.error('Error creating training plan:', planError)
-        return
-      }
+      const data = await createTrainingPlan(
+        supabase,
+        id,
+        format(selectedDate, 'yyyy-MM-dd'),
+        planExercises
+      )
 
       setPlanExercises([])
       setIsAddingPlan(false)
-      
-      setTrainingPlans([{
-        id: planData[0].id,
-        athlete_id: id,
-        date: format(selectedDate, 'yyyy-MM-dd'),
-        exercises_data: planData[0].exercises_data,
-        created_at: planData[0].created_at
-      }])
+      setTrainingPlans([data])
     } catch (error) {
       console.error('Error:', error)
     }
+  }
+
+  // Retrieves a training plan for a specific date
+  const getTrainingPlanForDate = (date: Date) => {
+    return trainingPlans.find(plan => 
+      plan.date === format(date, 'yyyy-MM-dd')
+    )
   }
 
   if (loading) {

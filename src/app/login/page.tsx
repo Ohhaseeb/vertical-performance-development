@@ -23,6 +23,8 @@ export default function Login() {
     password: "",
   })
 
+  
+  // Handle input change from form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
@@ -31,6 +33,7 @@ export default function Login() {
     }));
   }
 
+  // Handle form submission, calls login action from actions.ts, if it is an error then it will show a toast error otherwise will log user in
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
     const result = await login(formData);
@@ -40,6 +43,7 @@ export default function Login() {
     setIsLoading(false);
   }
 
+  // Handle forgot password, if the email is not entered then it will show a toast error otherwise it will send a reset password email
   const handleForgotPassword = async () => {
     if (!formData.email) {
       toast.error("Please enter your email address");
@@ -65,6 +69,7 @@ export default function Login() {
     }
   }
 
+  // Render the login page
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-900 to-black">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
