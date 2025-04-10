@@ -480,68 +480,77 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
         {selectedDate && (
           <Card className="mt-6 bg-neutral-950 border border-blue-500">
-            <CardHeader>
-              <CardTitle className="text-white">
-                Training for {format(selectedDate, 'MMMM d, yyyy')}
-              </CardTitle>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white">
+                  Training for {format(selectedDate, 'MMMM d, yyyy')}
+                </CardTitle>
+                {getTrainingPlanForDate(selectedDate) && (
+                  <Dialog open={isCopyingPlan} onOpenChange={setIsCopyingPlan}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="text-white hover:text-blue-400">
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy Plan
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-neutral-950 border border-blue-500">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">Copy Training Plan</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="athlete" className="text-white">Select Athlete</Label>
+                          <Select
+                            value={selectedAthleteId}
+                            onValueChange={setSelectedAthleteId}
+                          >
+                            <SelectTrigger className="bg-neutral-900 border-neutral-800 text-white">
+                              <SelectValue placeholder="Select an athlete" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-neutral-900 border-neutral-800">
+                              {athletes.map((athlete) => (
+                                <SelectItem key={athlete.id} value={athlete.id}>
+                                  {athlete.first_name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button 
+                          onClick={() => {
+                            const plan = getTrainingPlanForDate(selectedDate)
+                            if (plan) handleCopyTrainingPlan(plan)
+                          }}
+                          className="w-full bg-gradient-to-r from-blue-600 to-white text-black hover:from-blue-700 hover:to-gray-100 transition-all"
+                        >
+                          Copy Training Plan
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {getTrainingPlanForDate(selectedDate) ? (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-medium text-white">Exercises:</h3>
-                    <Dialog open={isCopyingPlan} onOpenChange={setIsCopyingPlan}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="text-white">
-                          <Copy className="h-4 w-4 mr-2" />
-                          Copy to Another Athlete
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-neutral-950 border border-blue-500">
-                        <DialogHeader>
-                          <DialogTitle className="text-white">Copy Training Plan</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="athlete" className="text-white">Select Athlete</Label>
-                            <Select
-                              value={selectedAthleteId}
-                              onValueChange={setSelectedAthleteId}
-                            >
-                              <SelectTrigger className="bg-neutral-900 border-neutral-800 text-white">
-                                <SelectValue placeholder="Select an athlete" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-neutral-900 border-neutral-800">
-                                {athletes.map((athlete) => (
-                                  <SelectItem key={athlete.id} value={athlete.id}>
-                                    {athlete.first_name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <Button 
-                            onClick={() => {
-                              const plan = getTrainingPlanForDate(selectedDate)
-                              if (plan) handleCopyTrainingPlan(plan)
-                            }}
-                            className="w-full bg-gradient-to-r from-blue-600 to-white text-black hover:from-blue-700 hover:to-gray-100 transition-all"
-                          >
-                            Copy Training Plan
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
+                <div className="space-y-2">
                   {getTrainingPlanForDate(selectedDate)?.training_plan_exercises?.map((exercise) => (
-                    <div key={exercise.id} className="bg-neutral-900 p-3 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="text-white">{exercise.exercises.name}</span>
-                        <span className="text-gray-400">{exercise.sets} sets × {exercise.reps} reps</span>
+                    <div key={exercise.id} className="flex flex-col space-y-1">
+                      <div className="flex justify-start text-sm">
+                        <span className="text-gray-400">Exercise:</span>
+                        <span className="text-white ml-2 font-medium">{exercise.exercises.name}</span>
+                      </div>
+                      <div className="flex justify-start text-sm">
+                        <span className="text-gray-400">Sets × Reps:</span>
+                        <span className="text-white ml-2">{exercise.sets} × {exercise.reps}</span>
                       </div>
                       {exercise.notes && (
-                        <p className="text-sm text-gray-400 mt-1">{exercise.notes}</p>
+                        <div className="flex justify-start text-sm">
+                          <span className="text-gray-400">Notes:</span>
+                          <span className="text-white ml-2">{exercise.notes}</span>
+                        </div>
                       )}
+                      <div className="border-t border-neutral-800 mt-2 pt-2"></div>
                     </div>
                   ))}
                 </div>
@@ -559,7 +568,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                       <DialogTitle className="text-white">Add Training Plan for {format(selectedDate, 'MMMM d, yyyy')}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 pt-4">
-                      {/* List of exercises already added to the plan */}
                       {planExercises.length > 0 && (
                         <div className="space-y-2">
                           <h3 className="text-sm font-medium text-white">Exercises in Plan:</h3>
@@ -579,7 +587,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                         </div>
                       )}
 
-                      {/* Add new exercise to database */}
                       <Dialog open={isAddingExercise} onOpenChange={setIsAddingExercise}>
                         <DialogTrigger asChild>
                           <Button variant="outline" className="w-full">
@@ -612,7 +619,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                         </DialogContent>
                       </Dialog>
 
-                      {/* Add exercise to plan */}
                       <div className="space-y-4 border-t border-neutral-800 pt-4">
                         <div className="space-y-2">
                           <Label htmlFor="exercise" className="text-white">Select Exercise</Label>
@@ -625,7 +631,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                             </SelectTrigger>
                             <SelectContent className="bg-neutral-900 border-neutral-800">
                               {exercises.map((exercise) => (
-                                <SelectItem key={exercise.id} value={exercise.id}>
+                                <SelectItem key={exercise.id} value={exercise.id} className="text-white hover:bg-blue-900/20">
                                   {exercise.name}
                                 </SelectItem>
                               ))}
@@ -640,7 +646,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                               type="number"
                               value={currentExercise.sets}
                               onChange={(e) => setCurrentExercise({ ...currentExercise, sets: e.target.value })}
-                              className="bg-neutral-900 border-neutral-800 text-white"
+                              className="bg-neutral-900 border-neutral-800 text-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="Number of sets"
                             />
                           </div>
@@ -651,7 +657,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                               type="number"
                               value={currentExercise.reps}
                               onChange={(e) => setCurrentExercise({ ...currentExercise, reps: e.target.value })}
-                              className="bg-neutral-900 border-neutral-800 text-white"
+                              className="bg-neutral-900 border-neutral-800 text-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="Number of reps"
                             />
                           </div>
