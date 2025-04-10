@@ -74,8 +74,5 @@ You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, 
 - Implement error boundaries and error.tsx files for error handling.
 - Use loading.tsx files for managing loading states.
 
-**SEO and Metadata**
-
-- Use Next.js 14's metadata API for SEO optimization.
 
 **Follow Next.js docs for Data Fetching, Rendering, and Routing.**

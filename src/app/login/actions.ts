@@ -5,11 +5,13 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 
+// Server action for login 
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
+  // should sanitize user input tomorrow Haseeb
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,

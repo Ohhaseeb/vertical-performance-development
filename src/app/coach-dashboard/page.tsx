@@ -46,12 +46,9 @@ export default function CoachDashboardPage() {
           console.error('Error fetching profiles:', error);
           return;
         }
-        
-        
-        
+         
         if (data) {
           setUsers(data);
-         
         }
         setLoading(false);
       } catch (error) {
@@ -189,8 +186,9 @@ export default function CoachDashboardPage() {
                   <CardFooter>
                     <Button
                       className="w-full bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90"
+                      onClick={() => router.push(`/athlete/${user.id}`)}
                     >
-                      View Details
+                      View Calendar
                     </Button>
                   </CardFooter>
                 </Card>
