@@ -28,19 +28,20 @@ interface Exercise {
 }
 
 interface TrainingPlanExercise {
-  id: string;
+  id?: string;
   exercise_id: string;
   sets: number;
   reps: number;
   notes: string;
-  exercises: Exercise;
+  exercise_name?: string;
+  exercises?: Exercise;
 }
 
 interface TrainingPlan {
   id: string;
   athlete_id: string;
   date: string;
-  training_plan_exercises: TrainingPlanExercise[];
+  exercises_data: TrainingPlanExercise[];
   created_at: string;
 }
 
@@ -54,11 +55,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [loading, setLoading] = useState(true)
   const [trainingPlans, setTrainingPlans] = useState<TrainingPlan[]>([])
   const [isAddingPlan, setIsAddingPlan] = useState(false)
-  const [newPlan, setNewPlan] = useState({
-    warmup: "",
-    main_workout: "",
-    cooldown: ""
-  })
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [isAddingExercise, setIsAddingExercise] = useState(false)
   const [newExercise, setNewExercise] = useState("")
@@ -75,8 +71,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   })
   const [planExercises, setPlanExercises] = useState<TrainingPlanExercise[]>([])
   const [athletes, setAthletes] = useState<Profile[]>([])
-  const [isCopyingPlan, setIsCopyingPlan] = useState(false)
-  const [selectedAthleteId, setSelectedAthleteId] = useState("")
 
   useEffect(() => {
     const fetchAthlete = async () => {
@@ -105,33 +99,44 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   useEffect(() => {
     const fetchTrainingPlans = async () => {
+      if (!selectedDate) return;
+      
       try {
         const { data, error } = await supabase
-          .from('training_plans')
-          .select(`
-            *,
-            training_plan_exercises (
-              id,
-              exercise_id,
-              sets,
-              reps,
-              notes,
-              exercises (
-                id,
-                name
-              )
-            )
-          `)
+          .from('new_training_plans')
+          .select('*')
           .eq('athlete_id', id)
+          .eq('date', format(selectedDate, 'yyyy-MM-dd'))
+          .single()
         
         if (error) {
-          console.error('Error fetching training plans:', error)
+          
+          if (error.code === 'PGRST116') {
+            setTrainingPlans([])
+          }
           return
         }
 
         if (data) {
           console.log('Fetched training plans:', data)
-          setTrainingPlans(data)
+          setTrainingPlans([{
+            id: data.id,
+            athlete_id: id,
+            date: format(selectedDate, 'yyyy-MM-dd'),
+            exercises_data: Array.isArray(data.exercises_data) ? data.exercises_data.map((exercise: any) => ({
+              id: exercise.id || crypto.randomUUID(),
+              exercise_id: exercise.exercise_id,
+              sets: exercise.sets,
+              reps: exercise.reps,
+              notes: exercise.notes,
+              exercise_name: exercise.exercise_name,
+              exercises: {
+                id: exercise.exercise_id,
+                name: exercise.exercise_name
+              }
+            })) : [],
+            created_at: data.created_at
+          }])
         }
       } catch (error) {
         console.error('Error:', error)
@@ -139,7 +144,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     }
 
     fetchTrainingPlans()
-  }, [id])
+  }, [id, selectedDate])
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -171,7 +176,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .neq('id', id) // Exclude current athlete
+          .neq('id', id)
         
         if (error) {
           console.error('Error fetching athletes:', error)
@@ -202,16 +207,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
     try {
       const { data, error } = await supabase
-        .from('training_plans')
-        .insert([
-          {
-            athlete_id: id,
-            date: format(selectedDate, 'yyyy-MM-dd'),
-            warmup: newPlan.warmup,
-            main_workout: newPlan.main_workout,
-            cooldown: newPlan.cooldown
-          }
-        ])
+        .from('new_training_plans')
+        .insert({
+          athlete_id: id,
+          date: format(selectedDate, 'yyyy-MM-dd'),
+          exercises_data: planExercises.map(exercise => ({
+            exercise_id: exercise.exercise_id,
+            sets: exercise.sets,
+            reps: exercise.reps,
+            notes: exercise.notes,
+            exercise_name: exercise.exercises?.name || exercise.exercise_name
+          }))
+        })
         .select()
 
       if (error) {
@@ -220,8 +227,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
 
       if (data) {
-        setTrainingPlans([...trainingPlans, ...data])
-        setNewPlan({ warmup: "", main_workout: "", cooldown: "" })
+        setTrainingPlans([...trainingPlans, {
+          id: data[0].id,
+          athlete_id: id,
+          date: format(selectedDate, 'yyyy-MM-dd'),
+          exercises_data: planExercises,
+          created_at: data[0].created_at
+        }])
         setIsAddingPlan(false)
       }
     } catch (error) {
@@ -270,9 +282,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const newPlanExercise: TrainingPlanExercise = {
       id: crypto.randomUUID(),
       exercise_id: currentExercise.exercise_id,
-      sets: parseInt(currentExercise.sets),
-      reps: parseInt(currentExercise.reps),
+      sets: Number(currentExercise.sets),
+      reps: Number(currentExercise.reps),
       notes: currentExercise.notes,
+      exercise_name: exercise.name,
       exercises: exercise
     }
 
@@ -289,13 +302,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     if (!selectedDate || planExercises.length === 0) return
 
     try {
-      // First create the training plan
       const { data: planData, error: planError } = await supabase
-        .from('training_plans')
-        .insert([{
+        .from('new_training_plans')
+        .insert({
           athlete_id: id,
-          date: format(selectedDate, 'yyyy-MM-dd')
-        }])
+          date: format(selectedDate, 'yyyy-MM-dd'),
+          exercises_data: planExercises.map(exercise => ({
+            exercise_id: exercise.exercise_id,
+            sets: exercise.sets,
+            reps: exercise.reps,
+            notes: exercise.notes,
+            exercise_name: exercise.exercises?.name || exercise.exercise_name
+          }))
+        })
         .select()
 
       if (planError || !planData) {
@@ -303,93 +322,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         return
       }
 
-      // Then add all exercises
-      const { error: exercisesError } = await supabase
-        .from('training_plan_exercises')
-        .insert(
-          planExercises.map(exercise => ({
-            training_plan_id: planData[0].id,
-            exercise_id: exercise.exercise_id,
-            sets: exercise.sets,
-            reps: exercise.reps,
-            notes: exercise.notes
-          }))
-        )
-
-      if (exercisesError) {
-        console.error('Error adding exercises to plan:', exercisesError)
-        return
-      }
-
-      // Reset and close dialog
       setPlanExercises([])
       setIsAddingPlan(false)
       
-      // Refresh training plans
-      const { data: updatedPlan } = await supabase
-        .from('training_plans')
-        .select(`
-          *,
-          training_plan_exercises (
-            id,
-            exercise_id,
-            sets,
-            reps,
-            notes,
-            exercises (
-              name
-            )
-          )
-        `)
-        .eq('id', planData[0].id)
-        .single()
-
-      if (updatedPlan) {
-        setTrainingPlans([...trainingPlans, updatedPlan])
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
-  const handleCopyTrainingPlan = async (sourcePlan: TrainingPlan) => {
-    if (!selectedAthleteId) return
-
-    try {
-      // First create the new training plan
-      const { data: planData, error: planError } = await supabase
-        .from('training_plans')
-        .insert([{
-          athlete_id: selectedAthleteId,
-          date: sourcePlan.date
-        }])
-        .select()
-
-      if (planError || !planData) {
-        console.error('Error creating training plan:', planError)
-        return
-      }
-
-      // Then copy all exercises
-      const { error: exercisesError } = await supabase
-        .from('training_plan_exercises')
-        .insert(
-          sourcePlan.training_plan_exercises.map(exercise => ({
-            training_plan_id: planData[0].id,
-            exercise_id: exercise.exercise_id,
-            sets: exercise.sets,
-            reps: exercise.reps,
-            notes: exercise.notes
-          }))
-        )
-
-      if (exercisesError) {
-        console.error('Error copying exercises:', exercisesError)
-        return
-      }
-
-      setIsCopyingPlan(false)
-      setSelectedAthleteId("")
+      setTrainingPlans([{
+        id: planData[0].id,
+        athlete_id: id,
+        date: format(selectedDate, 'yyyy-MM-dd'),
+        exercises_data: planData[0].exercises_data,
+        created_at: planData[0].created_at
+      }])
     } catch (error) {
       console.error('Error:', error)
     }
@@ -485,60 +427,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 <CardTitle className="text-white">
                   Training for {format(selectedDate, 'MMMM d, yyyy')}
                 </CardTitle>
-                {getTrainingPlanForDate(selectedDate) && (
-                  <Dialog open={isCopyingPlan} onOpenChange={setIsCopyingPlan}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-white hover:text-blue-400">
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy Plan
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-neutral-950 border border-blue-500">
-                      <DialogHeader>
-                        <DialogTitle className="text-white">Copy Training Plan</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 pt-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="athlete" className="text-white">Select Athlete</Label>
-                          <Select
-                            value={selectedAthleteId}
-                            onValueChange={setSelectedAthleteId}
-                          >
-                            <SelectTrigger className="bg-neutral-900 border-neutral-800 text-white">
-                              <SelectValue placeholder="Select an athlete" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-neutral-900 border-neutral-800">
-                              {athletes.map((athlete) => (
-                                <SelectItem key={athlete.id} value={athlete.id}>
-                                  {athlete.first_name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button 
-                          onClick={() => {
-                            const plan = getTrainingPlanForDate(selectedDate)
-                            if (plan) handleCopyTrainingPlan(plan)
-                          }}
-                          className="w-full bg-gradient-to-r from-blue-600 to-white text-black hover:from-blue-700 hover:to-gray-100 transition-all"
-                        >
-                          Copy Training Plan
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
               </div>
             </CardHeader>
             <CardContent>
               {getTrainingPlanForDate(selectedDate) ? (
                 <div className="space-y-2">
-                  {getTrainingPlanForDate(selectedDate)?.training_plan_exercises?.map((exercise) => (
+                  {getTrainingPlanForDate(selectedDate)?.exercises_data?.map((exercise) => (
                     <div key={exercise.id} className="flex flex-col space-y-1">
                       <div className="flex justify-start text-sm">
                         <span className="text-gray-400">Exercise:</span>
-                        <span className="text-white ml-2 font-medium">{exercise.exercises.name}</span>
+                        <span className="text-white ml-2 font-medium">{exercise.exercise_name || exercise.exercises?.name}</span>
                       </div>
                       <div className="flex justify-start text-sm">
                         <span className="text-gray-400">Sets × Reps:</span>
@@ -575,7 +473,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                             {planExercises.map((exercise) => (
                               <div key={exercise.id} className="bg-neutral-900 p-3 rounded-lg">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-white">{exercise.exercises.name}</span>
+                                  <span className="text-white">{exercise.exercise_name || exercise.exercises?.name}</span>
                                   <span className="text-gray-400">{exercise.sets} sets × {exercise.reps} reps</span>
                                 </div>
                                 {exercise.notes && (
