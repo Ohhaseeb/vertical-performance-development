@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   CheckCircle,
 } from "lucide-react"
+import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, parseISO } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,56 +23,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { getUser } from "@/queries/user"
+import { TrainingPlan, TrainingPlanExercise, getWeeklyTrainingPlans } from "@/queries/training"
 
-interface Exercise {
-  id: number
-  name: string
-  sets: number
-  reps: string
-  weight: string
-  completed: boolean
-}
-
-type DaySchedule = Exercise[]
-
-interface ExerciseSchedule {
-  [key: string]: DaySchedule
-}
-
-// Mock data for weightlifting exercises
-const exercisesByDay: ExerciseSchedule = {
-  Monday: [
-    { id: 1, name: "Bench Press", sets: 4, reps: "8-10", weight: "135 lbs", completed: true },
-    { id: 2, name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "40 lbs", completed: true },
-    { id: 3, name: "Cable Flyes", sets: 3, reps: "12-15", weight: "25 lbs", completed: false },
-  ],
-  Tuesday: [
-    { id: 4, name: "Squats", sets: 4, reps: "8-10", weight: "185 lbs", completed: false },
-    { id: 5, name: "Leg Press", sets: 3, reps: "10-12", weight: "225 lbs", completed: false },
-    { id: 6, name: "Leg Extensions", sets: 3, reps: "12-15", weight: "90 lbs", completed: false },
-  ],
-  Wednesday: [
-    { id: 7, name: "Pull-ups", sets: 4, reps: "8-10", weight: "Bodyweight", completed: false },
-    { id: 8, name: "Barbell Rows", sets: 3, reps: "10-12", weight: "115 lbs", completed: false },
-    { id: 9, name: "Lat Pulldowns", sets: 3, reps: "12-15", weight: "100 lbs", completed: false },
-  ],
-  Thursday: [
-    { id: 10, name: "Overhead Press", sets: 4, reps: "8-10", weight: "95 lbs", completed: false },
-    { id: 11, name: "Lateral Raises", sets: 3, reps: "10-12", weight: "15 lbs", completed: false },
-    { id: 12, name: "Face Pulls", sets: 3, reps: "12-15", weight: "45 lbs", completed: false },
-  ],
-  Friday: [
-    { id: 13, name: "Deadlifts", sets: 4, reps: "6-8", weight: "225 lbs", completed: false },
-    { id: 14, name: "Romanian Deadlifts", sets: 3, reps: "8-10", weight: "135 lbs", completed: false },
-    { id: 15, name: "Hyperextensions", sets: 3, reps: "12-15", weight: "Bodyweight", completed: false },
-  ],
-  Saturday: [
-    { id: 16, name: "Bicep Curls", sets: 4, reps: "10-12", weight: "30 lbs", completed: false },
-    { id: 17, name: "Tricep Pushdowns", sets: 3, reps: "10-12", weight: "50 lbs", completed: false },
-    { id: 18, name: "Hammer Curls", sets: 3, reps: "12-15", weight: "25 lbs", completed: false },
-  ],
-  Sunday: [{ id: 19, name: "Rest Day", sets: 0, reps: "0", weight: "0", completed: false }],
-}
+// Days of the week
+const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 // Mock data for progress
 const progressStats = {
@@ -81,16 +36,27 @@ const progressStats = {
   totalGoals: 10,
 }
 
-// Days of the week
-const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+// Type for tracking completed exercises
+interface CompletedExercise {
+  exerciseId: string;
+  date: string;
+}
 
 export default function DashboardPage() {
   const supabase = createClientClient();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [currentWeek, setCurrentWeek] = useState("This Week");
+  const [trainingPlans, setTrainingPlans] = useState<TrainingPlan[]>([]);
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [showAllDays, setShowAllDays] = useState(false);
+  const [completedExercises, setCompletedExercises] = useState<CompletedExercise[]>([]);
+
+  // Calculate current week end
+  const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
+  
+  // Format dates for display
+  const currentWeekDisplay = `${format(currentWeekStart, 'MMM d')} - ${format(currentWeekEnd, 'MMM d, yyyy')}`;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -111,9 +77,56 @@ export default function DashboardPage() {
       }
     };
 
-    
     fetchUser();
   }, [router]);
+
+  useEffect(() => {
+    // Fetch training plans for the current week
+    const fetchTrainingPlans = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const startDateStr = format(currentWeekStart, 'yyyy-MM-dd');
+        const endDateStr = format(currentWeekEnd, 'yyyy-MM-dd');
+        
+        const plans = await getWeeklyTrainingPlans(
+          supabase,
+          user.id,
+          startDateStr,
+          endDateStr
+        );
+        
+        setTrainingPlans(plans);
+      } catch (error) {
+        console.error('Error fetching training plans:', error);
+      }
+    };
+    
+    if (user) {
+      fetchTrainingPlans();
+    }
+  }, [user, currentWeekStart, supabase]);
+
+  // Load completed exercises from localStorage when component mounts
+  useEffect(() => {
+    if (user?.id) {
+      const savedCompletedExercises = localStorage.getItem(`completed-exercises-${user.id}`);
+      if (savedCompletedExercises) {
+        try {
+          setCompletedExercises(JSON.parse(savedCompletedExercises));
+        } catch (e) {
+          console.error('Error parsing completed exercises from localStorage:', e);
+        }
+      }
+    }
+  }, [user]);
+
+  // Save completed exercises to localStorage whenever they change
+  useEffect(() => {
+    if (user?.id && completedExercises.length > 0) {
+      localStorage.setItem(`completed-exercises-${user.id}`, JSON.stringify(completedExercises));
+    }
+  }, [completedExercises, user]);
 
   const handleSignOut = async () => {
     try {
@@ -121,6 +134,58 @@ export default function DashboardPage() {
       router.push('/');
     } catch (error) {
       console.error("Error signing out:", error);
+    }
+  };
+
+  // Go to previous week
+  const previousWeek = () => {
+    setCurrentWeekStart(subWeeks(currentWeekStart, 1));
+  };
+
+  // Go to next week
+  const nextWeek = () => {
+    setCurrentWeekStart(addWeeks(currentWeekStart, 1));
+  };
+
+  // Get training plan for a specific day
+  const getTrainingPlanForDay = (dayName: string) => {
+    // Map day name to day number (0 = Monday, 6 = Sunday)
+    const dayIndex = daysOfWeek.indexOf(dayName);
+    if (dayIndex === -1) return null;
+    
+    // Calculate the date for this day
+    const dayDate = new Date(currentWeekStart);
+    dayDate.setDate(currentWeekStart.getDate() + dayIndex);
+    const formattedDate = format(dayDate, 'yyyy-MM-dd');
+    
+    // Find the plan for this date
+    return trainingPlans.find(plan => plan.date === formattedDate);
+  };
+
+  // Check if an exercise is completed
+  const isExerciseCompleted = (exerciseId: string, date: string) => {
+    return completedExercises.some(
+      (completed) => completed.exerciseId === exerciseId && completed.date === date
+    );
+  };
+
+  // Toggle completion status of an exercise
+  const toggleExerciseCompletion = (exerciseId: string, date: string) => {
+    const isCompleted = isExerciseCompleted(exerciseId, date);
+    
+    if (isCompleted) {
+      // Remove from completed exercises
+      setCompletedExercises(
+        completedExercises.filter(
+          (completed) => !(completed.exerciseId === exerciseId && completed.date === date)
+        )
+      );
+    } else {
+      // Add to completed exercises
+      setCompletedExercises([
+        ...completedExercises,
+        { exerciseId, date }
+      ]);
     }
   };
 
@@ -216,25 +281,41 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-white text-xl">Weekly Schedule</CardTitle>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="text-gray-300 hover:text-blue-400">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-gray-300 hover:text-blue-400"
+                          onClick={previousWeek}
+                        >
                           <ChevronLeft className="h-4 w-4" />
                           <span className="sr-only">Previous Week</span>
                         </Button>
-                        <span className="text-sm text-gray-200">{currentWeek}</span>
-                        <Button variant="ghost" size="icon" className="text-gray-300 hover:text-blue-400">
+                        <span className="text-sm text-gray-200">{currentWeekDisplay}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-gray-300 hover:text-blue-400"
+                          onClick={nextWeek}
+                        >
                           <ChevronRight className="h-4 w-4" />
                           <span className="sr-only">Next Week</span>
                         </Button>
                       </div>
                     </div>
-                    <CardDescription className="text-gray-300">Your weekly weightlifting exercises</CardDescription>
+                    <CardDescription className="text-gray-300">Your weekly training exercises</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {daysOfWeek
                         .filter((day, index) => showAllDays || index < 3)
                         .map((day) => {
-                          const exercises = exercisesByDay[day] || []
+                          const plan = getTrainingPlanForDay(day);
+                          const exercises = plan?.exercises_data || [];
+                          const dayDate = new Date(currentWeekStart);
+                          dayDate.setDate(currentWeekStart.getDate() + daysOfWeek.indexOf(day));
+                          const formattedDate = format(dayDate, 'MMM d');
+                          const dateStr = format(dayDate, 'yyyy-MM-dd');
+                          
                           return (
                             <div
                               key={day}
@@ -243,38 +324,44 @@ export default function DashboardPage() {
                               <div className="flex flex-row">
                                 <div className="bg-blue-900 p-4 w-32 flex flex-col justify-center items-center">
                                   <div className="text-white font-bold text-base">{day}</div>
+                                  <div className="text-white text-sm">{formattedDate}</div>
                                 </div>
                                 <div className="flex-1 p-4">
-                                  {exercises.length > 0 && day !== "Sunday" ? (
+                                  {exercises.length > 0 ? (
                                     <div className="space-y-3">
-                                      {exercises.map((exercise) => (
-                                        <div key={exercise.id} className="flex items-start justify-between">
-                                          <div>
-                                            <div className="flex items-center">
-                                              <h3 className="font-semibold text-white">{exercise.name}</h3>
-                                              {exercise.completed && (
-                                                <CheckCircle className="ml-2 h-4 w-4 text-green-500" />
-                                              )}
+                                      {exercises.map((exercise) => {
+                                        const completed = isExerciseCompleted(exercise.id!, dateStr);
+                                        
+                                        return (
+                                          <div key={exercise.id} className="flex items-start justify-between">
+                                            <div>
+                                              <div className="flex items-center">
+                                                <h3 className="font-semibold text-white">{exercise.exercise_name}</h3>
+                                                {completed && (
+                                                  <CheckCircle className="ml-2 h-4 w-4 text-green-500" />
+                                                )}
+                                              </div>
+                                              <p className="text-sm text-gray-300">
+                                                {exercise.sets} sets × {exercise.reps} reps
+                                                {exercise.notes && ` • ${exercise.notes}`}
+                                              </p>
                                             </div>
-                                            <p className="text-sm text-gray-300">
-                                              {exercise.sets} sets × {exercise.reps} reps • {exercise.weight}
-                                            </p>
-                                          </div>
-                                          {exercise.completed ? (
-                                            <Badge className="bg-green-900 text-green-300 hover:bg-green-900">
-                                              Completed
+                                            <Badge 
+                                              className={`cursor-pointer ${
+                                                completed 
+                                                  ? "bg-green-900 text-green-300 hover:bg-green-800" 
+                                                  : "bg-blue-900 text-blue-300 hover:bg-blue-800"
+                                              }`}
+                                              onClick={() => toggleExerciseCompletion(exercise.id!, dateStr)}
+                                            >
+                                              {completed ? "Completed" : "To Do"}
                                             </Badge>
-                                          ) : (
-                                            <Badge className="bg-blue-900 text-blue-300 hover:bg-blue-900">To Do</Badge>
-                                          )}
-                                        </div>
-                                      ))}
+                                          </div>
+                                        );
+                                      })}
                                     </div>
-                                  ) : day === "Sunday" ? (
-                                    <div className="flex items-center">
-                                      <p className="text-sm text-gray-300">Rest day - No exercises scheduled</p>
-                                    </div>
-                                  ) : (
+                                  ) 
+                                  : (
                                     <div className="flex items-center">
                                       <p className="text-sm text-gray-400">No exercises scheduled for this day</p>
                                     </div>

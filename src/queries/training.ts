@@ -123,4 +123,55 @@ export const createTrainingPlan = async (
       }
     }))
   } as TrainingPlan
+}
+
+/**
+ * Fetches all training plans for a specific athlete within a date range
+ * @param supabase - Supabase client instance
+ * @param athleteId - ID of the athlete
+ * @param startDate - Start date of the range (inclusive)
+ * @param endDate - End date of the range (inclusive)
+ * @returns Array of TrainingPlan objects
+ */
+export const getWeeklyTrainingPlans = async (
+  supabase: SupabaseClient,
+  athleteId: string,
+  startDate: string,
+  endDate: string
+) => {
+  // Query the database for training plans within the date range
+  const { data, error } = await supabase
+    .from('new_training_plans')
+    .select('*')
+    .eq('athlete_id', athleteId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: true })
+
+  if (error) throw error
+
+  // Return empty array if no data
+  if (!data || data.length === 0) return []
+
+  // Transform the raw database data into our TrainingPlan format
+  return data.map(plan => ({
+    id: plan.id,
+    athlete_id: athleteId,
+    date: plan.date,
+    exercises_data: Array.isArray(plan.exercises_data)
+      ? plan.exercises_data.map((exercise: any) => ({
+          id: exercise.id || exercise.exercise_id || crypto.randomUUID(),
+          exercise_id: exercise.exercise_id,
+          sets: exercise.sets,
+          reps: exercise.reps,
+          notes: exercise.notes,
+          exercise_name: exercise.exercise_name,
+          exercises: {
+            id: exercise.exercise_id,
+            name: exercise.exercise_name
+          }
+        }))
+      : [],
+    created_at: plan.created_at
+  })) as TrainingPlan[]
 } 

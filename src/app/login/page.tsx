@@ -77,13 +77,7 @@ export default function Login() {
           <div className="flex items-center gap-2">
             <Link href="/">
               <div className="flex items-center gap-2">
-                <Image
-                  src="/placeholder.svg?height=32&width=32"
-                  width={32}
-                  height={32}
-                  alt="VPD Logo"
-                  className="rounded"
-                />
+              
                 <span className="text-xl font-bold text-blue-400">VPD</span>
               </div>
             </Link>
