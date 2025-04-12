@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { createClientClient } from "@/utils/supabase/client"
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Copy } from "lucide-react"
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Copy, Check } from "lucide-react"
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday } from "date-fns"
 import { cn } from "@/lib/utils"
 
@@ -12,7 +12,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogOverlay } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 import { Profile, getAthleteById, getAllAthletes } from "@/queries/athlete"
 import { Exercise, getAllExercises, addExercise } from "@/queries/exercises"
@@ -361,21 +372,52 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                       <div className="space-y-4 border-t border-neutral-800 pt-4">
                         <div className="space-y-2">
                           <Label htmlFor="exercise" className="text-white">Select Exercise</Label>
-                          <Select
-                            value={currentExercise.exercise_id}
-                            onValueChange={(value: string) => setCurrentExercise({ ...currentExercise, exercise_id: value })}
-                          >
-                            <SelectTrigger className="bg-neutral-900 border-neutral-800 text-white">
-                              <SelectValue placeholder="Select an exercise" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-neutral-900 border-neutral-800">
-                              {exercises.map((exercise) => (
-                                <SelectItem key={exercise.id} value={exercise.id} className="text-white hover:bg-blue-900/20">
-                                  {exercise.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between bg-neutral-900 border-neutral-800 text-white",
+                                  !currentExercise.exercise_id && "text-gray-400"
+                                )}
+                              >
+                                {currentExercise.exercise_id
+                                  ? exercises.find((exercise) => exercise.id === currentExercise.exercise_id)?.name
+                                  : "Select an exercise..."}
+                                <ChevronRight className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0 bg-neutral-900 border-neutral-800">
+                              <Command className="bg-neutral-900">
+                                <CommandInput 
+                                  placeholder="Search exercises..." 
+                                  className="text-white placeholder:text-white [&_svg]:text-white"
+                                />
+                                <CommandEmpty className="py-2 text-gray-400">No exercise found.</CommandEmpty>
+                                <CommandGroup className="bg-neutral-900">
+                                  {exercises.map((exercise) => (
+                                    <CommandItem
+                                      key={exercise.id}
+                                      value={exercise.name}
+                                      onSelect={() => {
+                                        setCurrentExercise({ ...currentExercise, exercise_id: exercise.id })
+                                      }}
+                                      className="text-white hover:bg-blue-900/20 cursor-pointer"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          currentExercise.exercise_id === exercise.id ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {exercise.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
