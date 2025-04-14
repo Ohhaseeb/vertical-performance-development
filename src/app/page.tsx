@@ -239,7 +239,17 @@ export default function Home() {
               <Card className="bg-neutral-950 border border-blue-500">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-blue-500">
+                        <Image
+                          src="/images/charles.png"
+                          alt="Charles Carroll"
+                          width={48}
+                          height={48}
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
                     <div>
                       <p className="mb-2 italic text-gray-200">
                         "VDP and Coach Haseeb have been a game changer for me. I've improved my vertical jump by 4 inches and my hitting power has increased. His attention to detail as well as being able to push me in my training helped me become more prepared for my D1 volleyball season."
@@ -253,7 +263,17 @@ export default function Home() {
               <Card className="bg-neutral-950 border border-blue-500">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-blue-500">
+                        <Image
+                          src="/images/dylan.png"
+                          alt="Dylan Lau"
+                          width={48}
+                          height={48}
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
                     <div>
                       <p className="mb-2 italic text-gray-200">
                         "As a teamate of Haseeb in college volleyball, he was always the one that was able to jump higher than everyone else. I knew he had a secret to his success and now I know what it is. Its all the vertical jump training he has been doing the past 4 years, being able to talk to him about what type of training he has done and compare to my own gives me reassurance he knows what he is doing."
