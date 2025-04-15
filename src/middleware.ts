@@ -9,6 +9,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',       // Match /dashboard and all its sub-paths
     '/coach-dashboard/:path*', // Match /coach-dashboard and all its sub-paths
+    '/athlete/:path*', // Match /athlete and all its sub-paths
 
     
     // Add any other paths that require authentication here

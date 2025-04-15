@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircle,
+  Save,
 } from "lucide-react"
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, parseISO } from "date-fns"
 
@@ -42,6 +43,15 @@ interface CompletedExercise {
   date: string;
 }
 
+// Type for tracking logged exercise sets
+interface LoggedSet {
+  exerciseId: string;
+  date: string;
+  setIndex: number;
+  reps: string;
+  weight: string;
+}
+
 export default function DashboardPage() {
   const supabase = createClientClient();
   const router = useRouter();
@@ -51,6 +61,7 @@ export default function DashboardPage() {
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [showAllDays, setShowAllDays] = useState(false);
   const [completedExercises, setCompletedExercises] = useState<CompletedExercise[]>([]);
+  const [loggedSets, setLoggedSets] = useState<LoggedSet[]>([]);
 
   // Calculate current week end
   const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
@@ -128,6 +139,27 @@ export default function DashboardPage() {
     }
   }, [completedExercises, user]);
 
+  // Load logged sets from localStorage when component mounts
+  useEffect(() => {
+    if (user?.id) {
+      const savedLoggedSets = localStorage.getItem(`logged-sets-${user.id}`);
+      if (savedLoggedSets) {
+        try {
+          setLoggedSets(JSON.parse(savedLoggedSets));
+        } catch (e) {
+          console.error('Error parsing logged sets from localStorage:', e);
+        }
+      }
+    }
+  }, [user]);
+
+  // Save logged sets to localStorage whenever they change
+  useEffect(() => {
+    if (user?.id && loggedSets.length > 0) {
+      localStorage.setItem(`logged-sets-${user.id}`, JSON.stringify(loggedSets));
+    }
+  }, [loggedSets, user]);
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -185,6 +217,53 @@ export default function DashboardPage() {
       setCompletedExercises([
         ...completedExercises,
         { exerciseId, date }
+      ]);
+    }
+  };
+
+  // Get value for a specific logged set
+  const getLoggedSetValue = (exerciseId: string, date: string, setIndex: number, field: 'reps' | 'weight'): string => {
+    const loggedSet = loggedSets.find(
+      set => set.exerciseId === exerciseId && 
+             set.date === date && 
+             set.setIndex === setIndex
+    );
+    return loggedSet ? loggedSet[field] : '';
+  };
+
+  // Update logged set value
+  const updateLoggedSetValue = (
+    exerciseId: string, 
+    date: string, 
+    setIndex: number, 
+    field: 'reps' | 'weight', 
+    value: string
+  ) => {
+    const existingSetIndex = loggedSets.findIndex(
+      set => set.exerciseId === exerciseId && 
+             set.date === date && 
+             set.setIndex === setIndex
+    );
+
+    if (existingSetIndex >= 0) {
+      // Update existing set
+      const updatedSets = [...loggedSets];
+      updatedSets[existingSetIndex] = {
+        ...updatedSets[existingSetIndex],
+        [field]: value
+      };
+      setLoggedSets(updatedSets);
+    } else {
+      // Create new logged set
+      setLoggedSets([
+        ...loggedSets,
+        {
+          exerciseId,
+          date,
+          setIndex,
+          reps: field === 'reps' ? value : '',
+          weight: field === 'weight' ? value : ''
+        }
       ]);
     }
   };
@@ -334,7 +413,7 @@ export default function DashboardPage() {
                                         
                                         return (
                                           <div key={exercise.id} className="flex items-start justify-between">
-                                            <div>
+                                            <div className="w-full">
                                               <div className="flex items-center">
                                                 <h3 className="font-semibold text-white">{exercise.exercise_name}</h3>
                                                 {completed && (
@@ -345,16 +424,79 @@ export default function DashboardPage() {
                                                 {exercise.sets} sets × {exercise.reps} reps
                                                 {exercise.notes && ` • ${exercise.notes}`}
                                               </p>
+                                              
+                                              {/* Log Exercise Inputs */}
+                                              <div className="mt-2 space-y-2">
+                                                <div className="grid grid-cols-5 gap-2 text-xs text-gray-400 px-1 ">
+                                                  <div>Set</div>
+                                                  <div className="col-span-2">Reps</div>
+                                                  <div className="col-span-2">Weight (lbs)</div>
+                                                </div>
+                                                {Array.from({ length: exercise.sets }, (_, setIndex) => {
+                                                  const setReps = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps');
+                                                  const setWeight = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight');
+                                                  const isSetCompleted = setReps !== '' && setWeight !== '';
+                                                  
+                                                  return (
+                                                    <div key={`log-${exercise.id}-${setIndex}`} className={`grid grid-cols-5 gap-2 ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
+                                                      <div className="flex items-center justify-center text-xs text-gray-300 bg-neutral-800 border border-neutral-700 rounded text-white">
+                                                        {setIndex + 1}
+                                                      </div>
+                                                      <div className="col-span-2">
+                                                        <input 
+                                                          type="number"
+                                                          placeholder="Reps"
+                                                          value={setReps}
+                                                          onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps', e.target.value)}
+                                                          className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
+                                                        />
+                                                      </div>
+                                                      <div className="col-span-2">
+                                                        <input 
+                                                          type="number"
+                                                          placeholder="Weight"
+                                                          value={setWeight}
+                                                          onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight', e.target.value)}
+                                                          className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  )})}
+                                                  <div className="flex justify-end mt-3">
+                                                    <Button
+                                                      size="sm"
+                                                      className={`flex items-center gap-1 ${
+                                                        completed 
+                                                          ? "bg-green-700 hover:bg-green-800 text-white" 
+                                                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                                                      }`}
+                                                      onClick={() => {
+                                                        toggleExerciseCompletion(exercise.id!, dateStr);
+                                                      }}
+                                                    >
+                                                      {completed ? (
+                                                        <>
+                                                          <CheckCircle className="h-4 w-4" />
+                                                          
+                                                        </>
+                                                      ) : (
+                                                        <>
+                                                          <CheckCircle className="h-4 w-4" />
+                                                          Save
+                                                        </>
+                                                      )}
+                                                    </Button>
+                                                  </div>
+                                              </div>
                                             </div>
                                             <Badge 
-                                              className={`cursor-pointer ${
+                                              className={`ml-2 ${
                                                 completed 
-                                                  ? "bg-green-900 text-green-300 hover:bg-green-800" 
-                                                  : "bg-blue-900 text-blue-300 hover:bg-blue-800"
+                                                  ? "bg-green-900/50 text-green-300" 
+                                                  : "bg-blue-900/50 text-blue-300"
                                               }`}
-                                              onClick={() => toggleExerciseCompletion(exercise.id!, dateStr)}
                                             >
-                                              {completed ? "Completed" : "To Do"}
+                                              {completed ? "Completed" : "In Progress"}
                                             </Badge>
                                           </div>
                                         );

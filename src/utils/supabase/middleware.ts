@@ -59,6 +59,7 @@ export async function updateSession(request: NextRequest) {
     const isAdmin = user.email === 'haseebsayed960@gmail.com'
     const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard')
     const isOnCoachDashboard = request.nextUrl.pathname.startsWith('/coach-dashboard')
+    const isOnAthleteDashboard = request.nextUrl.pathname.startsWith('/athlete')
 
     console.log('Is admin:', isAdmin)
 
@@ -71,7 +72,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Redirect non-admin users trying to access coach dashboard
-    if (!isAdmin && isOnCoachDashboard) {
+    if (!isAdmin && (isOnCoachDashboard || isOnAthleteDashboard)) {
       console.log('Non-admin user trying to access coach dashboard, redirecting to dashboard')
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'

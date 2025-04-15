@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { createClientClient } from "@/utils/supabase/client"
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Copy, Check } from "lucide-react"
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Copy, Check, X, Trash2 } from "lucide-react"
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday } from "date-fns"
 import { cn } from "@/lib/utils"
 
@@ -245,6 +245,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               ))}
             </div>
             <div className="grid grid-cols-7 gap-1">
+              {Array(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay())
+                .fill(null)
+                .map((_, index) => (
+                  <div key={`empty-${index}`} className="h-12" />
+                ))}
               {days.map((day, index) => {
                 const isSelected = selectedDate && format(selectedDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
                 return (
@@ -326,7 +331,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                               <div key={exercise.id} className="bg-neutral-900 p-3 rounded-lg">
                                 <div className="flex justify-between items-center">
                                   <span className="text-white">{exercise.exercise_name || exercise.exercises?.name}</span>
-                                  <span className="text-gray-400">{exercise.sets} sets × {exercise.reps} reps</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-gray-400">{exercise.sets} sets × {exercise.reps} reps</span>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-7 w-7 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-900/20"
+                                      onClick={() => setPlanExercises(planExercises.filter(e => e.id !== exercise.id))}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                      <span className="sr-only">Delete exercise</span>
+                                    </Button>
+                                  </div>
                                 </div>
                                 {exercise.notes && (
                                   <p className="text-sm text-gray-400 mt-1">{exercise.notes}</p>
