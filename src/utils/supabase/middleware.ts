@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Middleware for the server
 export async function updateSession(request: NextRequest) {
-  console.log('Middleware triggered for path:', request.nextUrl.pathname)
+  //console.log('Middleware triggered for path:', request.nextUrl.pathname)
   
   let supabaseResponse = NextResponse.next({
     request,
@@ -42,11 +42,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  console.log('Session data:', user)
+  //console.log('Session data:', user)
 
   // If user is not logged in and trying to access protected routes
   if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth')) {
-    console.log('No session found, redirecting to login')
+    //console.log('No session found, redirecting to login')
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
@@ -54,18 +54,18 @@ export async function updateSession(request: NextRequest) {
 
   // If user is logged in, check their role and handle dashboard routing
   if (user) {
-    console.log('User is logged in, checking role')
+    //console.log('User is logged in, checking role')
     // this is not secure below should figure out a better way to do this
-    const isAdmin = user.email === 'haseebsayed960@gmail.com'
+    const isAdmin = user.email === process.env.NEXT_SERVER_ADMIN_EMAIL
     const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard')
     const isOnCoachDashboard = request.nextUrl.pathname.startsWith('/coach-dashboard')
     const isOnAthleteDashboard = request.nextUrl.pathname.startsWith('/athlete')
 
-    console.log('Is admin:', isAdmin)
+    //console.log('Is admin:', isAdmin)
 
     // Redirect admin users trying to access regular dashboard
     if (isAdmin && isOnDashboard) {
-      console.log('Admin user detected, redirecting to coach dashboard')
+      //console.log('Admin user detected, redirecting to coach dashboard')
       const url = request.nextUrl.clone()
       url.pathname = '/coach-dashboard'
       return NextResponse.redirect(url)
@@ -73,7 +73,7 @@ export async function updateSession(request: NextRequest) {
 
     // Redirect non-admin users trying to access coach dashboard
     if (!isAdmin && (isOnCoachDashboard || isOnAthleteDashboard)) {
-      console.log('Non-admin user trying to access coach dashboard, redirecting to dashboard')
+      //console.log('Non-admin user trying to access coach dashboard, redirecting to dashboard')
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       return NextResponse.redirect(url)

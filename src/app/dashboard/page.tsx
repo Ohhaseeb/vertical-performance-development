@@ -31,10 +31,8 @@ const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Sat
 
 // Mock data for progress
 const progressStats = {
-  attendanceRate: 92,
-  skillProgress: 78,
-  goalsCompleted: 8,
-  totalGoals: 10,
+  attendanceRate: 100,
+  skillProgress: 100,
 }
 
 // Type for tracking completed exercises
@@ -268,6 +266,35 @@ export default function DashboardPage() {
     }
   };
 
+  // Calculate percentage of completed workouts
+  const calculateWorkoutsCompleted = () => {
+    if (!trainingPlans.length) return 0;
+    
+    // Count all assigned exercises
+    const totalAssignedExercises = trainingPlans.reduce((total, plan) => {
+      return total + (plan.exercises_data?.length || 0);
+    }, 0);
+    
+    // Count completed exercises
+    const totalCompletedExercises = completedExercises.length;
+    
+    // Only count completions that match assigned exercises
+    const validCompletedExercises = completedExercises.filter(completed => {
+      // Find if this completed exercise exists in any training plan
+      return trainingPlans.some(plan => 
+        plan.exercises_data?.some(exercise => 
+          exercise.id === completed.exerciseId && 
+          plan.date === completed.date
+        )
+      );
+    }).length;
+    
+    // Calculate percentage (protect against division by zero)
+    return totalAssignedExercises > 0 
+      ? Math.min(100, Math.round((validCompletedExercises / totalAssignedExercises) * 100))
+      : 0;
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -279,6 +306,7 @@ export default function DashboardPage() {
   }
 
   const userFirstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Athlete';
+  const workoutsCompletedPercentage = calculateWorkoutsCompleted();
 
   return (
     <div className="flex min-h-screen flex-col bg-black dark">
@@ -296,12 +324,11 @@ export default function DashboardPage() {
               <Link href="/dashboard" className="font-medium text-blue-400 transition-colors">
                 Dashboard
               </Link>
-              <Link
-                href="/dashboard/progress"
+              <button
                 className="font-medium text-gray-200 transition-colors hover:text-blue-400"
               >
                 Progress
-              </Link>
+              </button>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -340,11 +367,37 @@ export default function DashboardPage() {
                 <p className="text-gray-300">Here's your weekly workout schedule</p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="border-blue-500 text-gray-200 hover:text-blue-400">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-blue-500 text-gray-200 hover:text-blue-400"
+                >
                   <Calendar className="mr-2 h-4 w-4" />
                   Full Calendar
                 </Button>
-                <Button className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90" size="sm">
+                <Button 
+                  className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90" 
+                  size="sm"
+                  onClick={() => {
+                    // Find today's date and scroll to it if it exists
+                    const today = new Date();
+                    const todayStr = format(today, 'EEEE'); // Get day name like "Monday"
+                    
+                    // Find the element with today's day - note this will change based on your DOM structure
+                    const todayElement = document.getElementById(`day-${todayStr}`) || 
+                                         document.querySelector(`[data-day="${todayStr}"]`);
+                    
+                    if (todayElement) {
+                      todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                      // If we can't find today's element, just scroll to the workout section
+                      const workoutSection = document.getElementById('weekly-schedule');
+                      if (workoutSection) {
+                        workoutSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }
+                  }}
+                >
                   <Dumbbell className="mr-2 h-4 w-4" />
                   Log Workout
                 </Button>
@@ -355,7 +408,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Weekly Schedule */}
               <div className="lg:col-span-3 space-y-6">
-                <Card className="bg-neutral-950 border border-blue-500">
+                <Card className="bg-neutral-950 border border-blue-500" id="weekly-schedule">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-white text-xl">Weekly Schedule</CardTitle>
@@ -398,6 +451,8 @@ export default function DashboardPage() {
                           return (
                             <div
                               key={day}
+                              id={`day-${day}`}
+                              data-day={day}
                               className="rounded-lg overflow-hidden bg-neutral-900 border border-neutral-800"
                             >
                               <div className="flex flex-row">
@@ -427,10 +482,12 @@ export default function DashboardPage() {
                                               
                                               {/* Log Exercise Inputs */}
                                               <div className="mt-2 space-y-2">
-                                                <div className="grid grid-cols-5 gap-2 text-xs text-gray-400 px-1 ">
+                                                <div className="grid grid-cols-8 gap-2 text-xs text-gray-400 px-1 ">
                                                   <div>Set</div>
+                                                  <div className="flex items-center justify-center"></div>
                                                   <div className="col-span-2">Reps</div>
-                                                  <div className="col-span-2">Weight (lbs)</div>
+                                                  <div className="flex items-center justify-center"></div>
+                                                  <div className="col-span-3">Weight (lbs)</div>
                                                 </div>
                                                 {Array.from({ length: exercise.sets }, (_, setIndex) => {
                                                   const setReps = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps');
@@ -438,11 +495,14 @@ export default function DashboardPage() {
                                                   const isSetCompleted = setReps !== '' && setWeight !== '';
                                                   
                                                   return (
-                                                    <div key={`log-${exercise.id}-${setIndex}`} className={`grid grid-cols-5 gap-2 ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
-                                                      <div className="flex items-center justify-center text-xs text-gray-300 bg-neutral-800 border border-neutral-700 rounded text-white">
+                                                    <div key={`log-${exercise.id}-${setIndex}`} className="grid grid-cols-8 gap-2">
+                                                      <div className={`flex items-center justify-center text-xs text-gray-300 bg-neutral-800 border border-neutral-700 rounded text-white ${isSetCompleted ? 'border-blue-500' : ''}`}>
                                                         {setIndex + 1}
                                                       </div>
-                                                      <div className="col-span-2">
+                                                      <div className="flex items-center justify-center text-gray-300">
+                                                        ×
+                                                      </div>
+                                                      <div className={`col-span-2 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
                                                         <input 
                                                           type="number"
                                                           placeholder="Reps"
@@ -451,7 +511,10 @@ export default function DashboardPage() {
                                                           className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
                                                         />
                                                       </div>
-                                                      <div className="col-span-2">
+                                                      <div className="flex items-center justify-center text-gray-300">
+                                                        :
+                                                      </div>
+                                                      <div className={`col-span-3 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
                                                         <input 
                                                           type="number"
                                                           placeholder="Weight"
@@ -546,15 +609,14 @@ export default function DashboardPage() {
                         </AvatarFallback>
                       </Avatar>
                       <h3 className="text-lg font-semibold text-white">{user?.user_metadata?.full_name || userFirstName}</h3>
-                      <p className="text-sm text-gray-300">Outside Hitter</p>
+                      <p className="text-sm text-gray-300">Athlete</p>
                       <div className="mt-4 w-full">
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-gray-300">Performance Plan</span>
                           <span className="text-blue-400">Active</span>
                         </div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-300">Next Session</span>
-                          <span className="text-white">Wednesday, 6:00 PM</span>
+                          
                         </div>
                       </div>
                     </div>
@@ -565,10 +627,10 @@ export default function DashboardPage() {
                       className="w-full border-blue-500 text-gray-200 hover:text-blue-400"
                       asChild
                     >
-                      <Link href="/dashboard/profile">
+                      <button >
                         <User className="mr-2 h-4 w-4" />
                         View Full Profile
-                      </Link>
+                      </button>
                     </Button>
                   </CardFooter>
                 </Card>
@@ -592,24 +654,10 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-300">Skill Progress</span>
-                          <span className="text-sm text-white">{progressStats.skillProgress}%</span>
+                          <span className="text-sm text-gray-300">Weekly Workouts Completed</span>
+                          <span className="text-sm text-white">{workoutsCompletedPercentage}%</span>
                         </div>
-                        <Progress value={progressStats.skillProgress} className="h-2 bg-neutral-800">
-                          <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full" />
-                        </Progress>
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-300">Goals Completed</span>
-                          <span className="text-sm text-white">
-                            {progressStats.goalsCompleted}/{progressStats.totalGoals}
-                          </span>
-                        </div>
-                        <Progress
-                          value={(progressStats.goalsCompleted / progressStats.totalGoals) * 100}
-                          className="h-2 bg-neutral-800"
-                        >
+                        <Progress value={workoutsCompletedPercentage} className="h-2 bg-neutral-800">
                           <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full" />
                         </Progress>
                       </div>
@@ -621,10 +669,10 @@ export default function DashboardPage() {
                       className="w-full border-blue-500 text-gray-200 hover:text-blue-400"
                       asChild
                     >
-                      <Link href="/dashboard/progress">
+                      <button>
                         <BarChart2 className="mr-2 h-4 w-4" />
                         View Detailed Progress
-                      </Link>
+                      </button>
                     </Button>
                   </CardFooter>
                 </Card>

@@ -36,25 +36,60 @@ export default function ResetPassword() {
     checkSession();
   }, [supabase, router]);
 
+  // Function to validate password strength
+  const validatePassword = (password: string) => {
+    // Password complexity requirements
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasNoSpaces = !/\s/.test(password);
+    
+    if (password.length < minLength) {
+      return "Password must be at least 8 characters long";
+    }
+    
+    if (!(hasUpperCase && hasLowerCase && hasNumbers)) {
+      return "Password must include uppercase, lowercase, and numbers";
+    }
+    
+    if (!hasSpecialChar) {
+      return "Password should include at least one special character";
+    }
+    
+    if (!hasNoSpaces) {
+      return "Password cannot contain spaces";
+    }
+    
+    return null; // No errors
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+    
+    // Sanitize input - prevent excessive length
+    const sanitizedValue = value.slice(0, 100);
+    
     setFormData(prev => ({
       ...prev,
-      [id]: value
+      [id]: sanitizedValue
     }));
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+    // Validate password strength
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      toast.error(passwordError);
       return;
     }
     
-    if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+    // Validate form
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
     
@@ -126,6 +161,7 @@ export default function ResetPassword() {
                         placeholder="••••••••"
                         className="bg-neutral-900 border-neutral-800 text-white pr-10"
                         required
+                        autoComplete="new-password"
                         value={formData.password}
                         onChange={handleInputChange}
                       />
@@ -139,7 +175,9 @@ export default function ResetPassword() {
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-400">Password must be at least 8 characters long</p>
+                    <p className="text-xs text-gray-400">
+                      Password must be at least 8 characters with uppercase, lowercase, numbers and special characters
+                    </p>
                   </div>
                   <div className="grid gap-3">
                     <Label htmlFor="confirmPassword" className="text-gray-200">
@@ -152,6 +190,7 @@ export default function ResetPassword() {
                         placeholder="••••••••"
                         className="bg-neutral-900 border-neutral-800 text-white pr-10"
                         required
+                        autoComplete="new-password"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
                       />
