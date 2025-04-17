@@ -55,6 +55,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     notes: ""
   })
   const [planExercises, setPlanExercises] = useState<TrainingPlanExercise[]>([])
+  const [monthTrainingPlans, setMonthTrainingPlans] = useState<{[key: string]: boolean}>({})
 
   // Fetches the athlete's profile data when the component mounts
   useEffect(() => {
@@ -110,6 +111,42 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
     fetchExercises()
   }, [])
+
+  // Add a new useEffect to fetch training plans for the entire month
+  useEffect(() => {
+    const fetchMonthTrainingPlans = async () => {
+      if (!currentDate || !id) return
+      
+      try {
+        const startDate = format(startOfMonth(currentDate), 'yyyy-MM-dd')
+        const endDate = format(endOfMonth(currentDate), 'yyyy-MM-dd')
+        
+        // Fetch plans from Supabase
+        const { data, error } = await supabase
+          .from('new_training_plans')
+          .select('date')
+          .eq('athlete_id', id)
+          .gte('date', startDate)
+          .lte('date', endDate)
+        
+        if (error) throw error
+        
+        // Create a map of dates with plans
+        const plansMap: {[key: string]: boolean} = {}
+        if (data) {
+          data.forEach(plan => {
+            plansMap[plan.date] = true
+          })
+        }
+        
+        setMonthTrainingPlans(plansMap)
+      } catch (error) {
+        console.error('Error fetching month training plans:', error)
+      }
+    }
+    
+    fetchMonthTrainingPlans()
+  }, [id, currentDate, supabase])
 
   // Navigates to the next month in the calendar
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1))
@@ -252,6 +289,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 ))}
               {days.map((day, index) => {
                 const isSelected = selectedDate && format(selectedDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
+                const dateStr = format(day, 'yyyy-MM-dd')
+                const hasTrainingPlan = monthTrainingPlans[dateStr]
+                
                 return (
                   <Button
                     key={day.toString()}
@@ -264,12 +304,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                     )}
                     onClick={() => setSelectedDate(day)}
                   >
-                    <time dateTime={format(day, 'yyyy-MM-dd')} className={cn(
-                      "inline-block w-full text-center",
-                      isSelected && "font-semibold"
-                    )}>
-                      {format(day, 'd')}
-                    </time>
+                    <div className="flex flex-col items-center justify-center w-full">
+                      <time dateTime={format(day, 'yyyy-MM-dd')} className={cn(
+                        "inline-block w-full text-center",
+                        isSelected && "font-semibold"
+                      )}>
+                        {format(day, 'd')}
+                      </time>
+                      {hasTrainingPlan && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-0.5"></div>
+                      )}
+                    </div>
                   </Button>
                 )
               })}

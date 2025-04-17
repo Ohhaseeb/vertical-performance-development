@@ -532,7 +532,7 @@ export default function Home() {
                 <span className="text-xl font-bold text-blue-400">VPD</span>
               </div>
               <p className="text-sm text-gray-300">
-                Volleyball Performance Development - Helping athletes reach their full potential through personalized
+                VPD - Helping athletes reach their full potential through personalized
                 training.
               </p>
             </div>
@@ -590,7 +590,7 @@ export default function Home() {
           </div>
           <div className="mt-8 border-t border-neutral-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-xs text-gray-300">
-              © {new Date().getFullYear()} Volleyball Performance Development. All rights reserved.
+              © {new Date().getFullYear()} VPD. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <span className="text-gray-300 cursor-default">

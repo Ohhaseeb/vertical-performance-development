@@ -194,7 +194,7 @@ export default function Signup() {
           <Card className="bg-neutral-950 border border-blue-500">
             <CardHeader>
               <CardTitle className="text-2xl text-white">Create an Account</CardTitle>
-              <CardDescription className="text-gray-300">Join our volleyball training program</CardDescription>
+              <CardDescription className="text-gray-300">Join our vertical jump training program</CardDescription>
             </CardHeader>
             <CardContent>
               {successMessage ? (
@@ -330,13 +330,13 @@ export default function Signup() {
                       />
                       <Label htmlFor="termsAccepted" className="text-sm text-gray-300">
                         I agree to the{" "}
-                        <Link href="/terms" className="text-blue-400 hover:underline">
+                        <span className="text-blue-400">
                           Terms of Service
-                        </Link>{" "}
+                        </span>{" "}
                         and{" "}
-                        <Link href="/privacy" className="text-blue-400 hover:underline">
+                        <span className="text-blue-400">
                           Privacy Policy
-                        </Link>
+                        </span>
                       </Label>
                       {errors.termsAccepted && <p className="text-xs text-red-500 ml-2">{errors.termsAccepted}</p>}
                     </div>
