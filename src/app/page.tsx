@@ -165,35 +165,66 @@ export default function Home() {
                   Hi there! I'm Coach Haseeb and I have been training for 5+ years, vertical jump training for 4+ years, and coaching volleyball for 2+ years. I transformed my vertical from not even being able to touch rim to a 37-38 inch vertical purely through training and research. I love training and have a passion for helping athletes reach their full potential, VPD was created to be an more affordable option for athletes willing to put in the hard work to increase their vertical.
                 </p>
                 <p className="text-gray-200 md:text-lg">
-                  VDP was created by me because of a problem I had with other vertical jump programs. They are too expensive! I'm talking about the good ones like THP Strength, not the ones that are just super generic and outdated. I say this because I was once a THP athlete myself paying upwards of $50 a month for a training methodologies that I had already been applying to myself (P.S that was on a discount, their regular price was over $100 a month!)
+                  VDP was created by me and Coach Dylan because of a problem we had with other vertical jump programs. They are too expensive! I'm talking about the good ones like THP Strength, not the ones that are just super generic and outdated. I say this because we were both was once THP athletes ourselves paying upwards of $50 a month for a training methodologies that we had already been applying to myself (P.S that was on a discount, their regular price was over $100 a month!)
                 </p>
                 <p className="text-gray-200 md:text-lg">
-                  But the main issue lies in the fact that the training was not personalized to the athlete and I was just simply not getting responses to my questions on a timely matter, it felt like I was just a number to them. I've been there, done that, and I'm here to tell you that here at VDP we take great care of our clients. This is a guarantee because unlike these other programs which are big businesses, VDP has much less clients meaning we can give you the attention you deserve.
+                  But the main issue lies in the fact that the training was not personalized to the athlete and we simply were not getting responses to questions on a timely matter, it felt like we were just a number to them. We've been there, done that, and I'm here to tell you that here at VDP we take great care of our clients. This is a guarantee because unlike these other programs which are big businesses, VDP has much less clients meaning we can give you the attention you deserve.
                 </p>
-                <ul className="text-gray-200 md:text-lg">
-                  <li>Below are my stats as an athlete:</li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> Vertical Jump: 38 inch
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> Squat: 355LB
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> Deadlift: 385LB
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> Bench Press: 250LB
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> Power Clean: 215LB
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> Volleyball at SJSU D1 team
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-white">•</span> 162LB with less than 12% body fat
-                  </li>
-                </ul>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-900/50 rounded-lg p-6 border border-blue-500/30 shadow-lg">
+                    <ul className="text-gray-200 md:text-lg">
+                      <li className="font-bold text-blue-400 mb-2">Coach Haseeb's stats:</li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Vertical Jump: 38 inch
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Squat: 355LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Deadlift: 385LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Bench Press: 250LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Power Clean: 215LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Volleyball at SJSU D1 team
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Height : 6'0
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-gray-900/50 rounded-lg p-6 border border-blue-500/30 shadow-lg">
+                    <ul className="text-gray-200 md:text-lg">
+                      <li className="font-bold text-blue-400 mb-2">Coach Dylan's stats:</li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Vertical Jump: 37 inch
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Squat: 355LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Deadlift: 385LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Bench Press: 250LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Power Clean: 215LB
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Volleyball at SJSU D1 team
+                      </li>
+                      <li className="flex items-center">
+                        <span className="mr-2 text-white">•</span> Height : 5'6
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
               <div className="space-y-6">
                 <div className="relative h-auto aspect-[4/3] overflow-hidden rounded-lg border border-blue-500">
@@ -207,12 +238,117 @@ export default function Home() {
                 </div>
                 <div className="relative h-auto aspect-[2/3] overflow-hidden rounded-lg border border-blue-500">
                   <Image
-                    src="/images/buff.png"
+                    src="/images/dylan_dunk.png"
                     alt="Physique demonstration"
                     fill
                     style={{ objectFit: 'cover' }}
                     className="rounded-lg"
                   />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-blue-500 to-black"></div>
+
+        {/* Sneak Peek Section */}
+        <section id="sneak-peek" className="w-full py-12 md:py-24 lg:py-32 bg-black">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">
+                  SNEAK PEEK AT OUR TRAINING AND RESULTS
+                </h2>
+                <p className="max-w-[900px] text-gray-200 md:text-xl/relaxed">
+                  A small taste of what you can expect from our training programs.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
+              {/* Success Story 1 */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white text-center mb-4 uppercase tracking-wider">
+                  Get 
+                  <br />
+                  Stronger
+                  
+                </h3>
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-blue-500/30 bg-neutral-900">
+                  <iframe 
+                    src="https://www.youtube.com/embed/Dv_A5xZf-Z8" 
+                    title="Get Stronger Training Video"
+                    className="absolute inset-0 w-full h-full"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+
+              {/* Success Story 2 */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white  text-center mb-4 uppercase tracking-wider">
+                  BECOME
+                  <br />
+                  EXPLOSIVE
+                </h3>
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-blue-500/30 bg-neutral-900">
+                  <iframe 
+                    src="https://www.youtube.com/embed/A7lqqQ1ERmg" 
+                    title="Become Explosive Training Video"
+                    className="absolute inset-0 w-full h-full"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+
+              {/* Success Story 3 */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white  text-center mb-4 uppercase tracking-wider">
+                  Physique <br />Transformation
+                </h3>
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-blue-500/30 bg-neutral-900">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full border-2 border-white flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <Image 
+                    src="/images/buff.png"
+                    alt="8 inch vertical gain transformation"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="z-0"
+                  />
+                </div>
+              </div>
+
+              {/* Success Story 4 */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white  text-center mb-4 uppercase tracking-wider">
+                  Exercise 
+                  <br />
+                  Variation
+                  
+                </h3>
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-blue-500/30 bg-neutral-900">
+                  <iframe 
+                    src="https://www.youtube.com/embed/NTRfFap1B0A" 
+                    title="Exercise Variation Training Video"
+                    className="absolute inset-0 w-full h-full"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
                 </div>
               </div>
             </div>
@@ -266,7 +402,7 @@ export default function Home() {
                     <div className="flex-shrink-0">
                       <div className="w-12 h-12 rounded-full overflow-hidden border border-blue-500">
                         <Image
-                          src="/images/dylan.png"
+                          src="/images/Gurmehak.png"
                           alt="Dylan Lau"
                           width={48}
                           height={48}
@@ -278,8 +414,8 @@ export default function Home() {
                       <p className="mb-2 italic text-gray-200">
                         "As a teamate of Haseeb in college volleyball, he was always the one that was able to jump higher than everyone else. I knew he had a secret to his success and now I know what it is. Its all the vertical jump training he has been doing the past 4 years, being able to talk to him about what type of training he has done and compare to my own gives me reassurance he knows what he is doing."
                       </p>
-                      <p className="font-semibold text-white">Dylan Lau</p>
-                      <p className="text-sm text-gray-300">Outside Hitter/Volleyball Coach, SJSU D1 Volleyball </p>
+                      <p className="font-semibold text-white">Gurmehak Singh</p>
+                      <p className="text-sm text-gray-300">Middle Blocker/Volleyball Coach, SJSU D1 Volleyball </p>
                     </div>
                   </div>
                 </CardContent>
@@ -309,7 +445,7 @@ export default function Home() {
                 <CardHeader>
                   <CardTitle className="text-white">Basic</CardTitle>
                   <div className="text-3xl font-bold text-white">
-                    $8<span className="text-sm font-normal text-gray-300">/month</span>
+                    $10<span className="text-sm font-normal text-gray-300">/month</span>
                   </div>
                   <CardDescription className="text-gray-200">Perfect for all</CardDescription>
                 </CardHeader>
@@ -347,7 +483,7 @@ export default function Home() {
                   <div className="text-center text-sm font-medium text-blue-400 mb-2">MOST POPULAR</div>
                   <CardTitle className="text-white">Performance</CardTitle>
                   <div className="text-3xl font-bold text-white">
-                    $10<span className="text-sm font-normal text-gray-300">/month</span>
+                    $25<span className="text-sm font-normal text-gray-300"> every 3 months</span>
                   </div>
                   <CardDescription className="text-gray-200">For dedicated athletes</CardDescription>
                 </CardHeader>
