@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   CheckCircle,
   Save,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react"
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, parseISO } from "date-fns"
 
@@ -50,6 +52,12 @@ interface LoggedSet {
   weight: string;
 }
 
+// Type for tracking expanded exercises
+interface ExpandedExercise {
+  exerciseId: string;
+  date: string;
+}
+
 export default function DashboardPage() {
   const supabase = createClientClient();
   const router = useRouter();
@@ -60,6 +68,7 @@ export default function DashboardPage() {
   const [showAllDays, setShowAllDays] = useState(false);
   const [completedExercises, setCompletedExercises] = useState<CompletedExercise[]>([]);
   const [loggedSets, setLoggedSets] = useState<LoggedSet[]>([]);
+  const [expandedExercises, setExpandedExercises] = useState<ExpandedExercise[]>([]);
 
   // Calculate current week end
   const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
@@ -295,6 +304,33 @@ export default function DashboardPage() {
       : 0;
   };
 
+  // Check if an exercise is expanded
+  const isExerciseExpanded = (exerciseId: string, date: string) => {
+    return expandedExercises.some(
+      (expanded) => expanded.exerciseId === exerciseId && expanded.date === date
+    );
+  };
+
+  // Toggle expansion status of an exercise
+  const toggleExerciseExpansion = (exerciseId: string, date: string) => {
+    const isExpanded = isExerciseExpanded(exerciseId, date);
+    
+    if (isExpanded) {
+      // Remove from expanded exercises
+      setExpandedExercises(
+        expandedExercises.filter(
+          (expanded) => !(expanded.exerciseId === exerciseId && expanded.date === date)
+        )
+      );
+    } else {
+      // Add to expanded exercises
+      setExpandedExercises([
+        ...expandedExercises,
+        { exerciseId, date }
+      ]);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -399,7 +435,7 @@ export default function DashboardPage() {
                   }}
                 >
                   <Dumbbell className="mr-2 h-4 w-4" />
-                  Log Workout
+                  Log Today's Workout
                 </Button>
               </div>
             </div>
@@ -465,102 +501,123 @@ export default function DashboardPage() {
                                     <div className="space-y-3">
                                       {exercises.map((exercise) => {
                                         const completed = isExerciseCompleted(exercise.id!, dateStr);
+                                        const expanded = isExerciseExpanded(exercise.id!, dateStr);
                                         
                                         return (
-                                          <div key={exercise.id} className="flex items-start justify-between">
-                                            <div className="w-full">
-                                              <div className="flex items-center">
-                                                <h3 className="font-semibold text-white">{exercise.exercise_name}</h3>
-                                                {completed && (
-                                                  <CheckCircle className="ml-2 h-4 w-4 text-green-500" />
+                                          <div key={exercise.id} className="rounded-md overflow-hidden border border-neutral-800 bg-neutral-950">
+                                            <div 
+                                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-neutral-900 transition-colors"
+                                              onClick={(e) => {
+                                                e.stopPropagation(); // Prevent triggering the parent click
+                                                toggleExerciseExpansion(exercise.id!, dateStr);
+                                              }}
+                                            >
+                                              <div className="flex-1">
+                                                <div className="flex items-center">
+                                                  <h3 className="font-semibold text-white">{exercise.exercise_name}</h3>
+                                                  {completed && (
+                                                    <CheckCircle className="ml-2 h-4 w-4 text-green-500" />
+                                                  )}
+                                                </div>
+                                                <p className="text-sm text-gray-300">
+                                                  {exercise.sets} sets × {exercise.reps} reps
+                                                  {exercise.notes && ` • ${exercise.notes}`}
+                                                </p>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <Badge 
+                                                  className={`${
+                                                    completed 
+                                                      ? "bg-green-900/50 text-green-300" 
+                                                      : "bg-blue-900/50 text-blue-300"
+                                                  }`}
+                                                >
+                                                  {completed ? "Completed" : "In Progress"}
+                                                </Badge>
+                                                {expanded ? (
+                                                  <ChevronUp className="h-4 w-4 text-gray-400" />
+                                                ) : (
+                                                  <ChevronDown className="h-4 w-4 text-gray-400" />
                                                 )}
                                               </div>
-                                              <p className="text-sm text-gray-300">
-                                                {exercise.sets} sets × {exercise.reps} reps
-                                                {exercise.notes && ` • ${exercise.notes}`}
-                                              </p>
-                                              
-                                              {/* Log Exercise Inputs */}
-                                              <div className="mt-2 space-y-2">
-                                                <div className="grid grid-cols-8 gap-2 text-xs text-gray-400 px-1 ">
-                                                  <div>Set</div>
-                                                  <div className="flex items-center justify-center"></div>
-                                                  <div className="col-span-2">Reps</div>
-                                                  <div className="flex items-center justify-center"></div>
-                                                  <div className="col-span-3">Weight (lbs)</div>
-                                                </div>
-                                                {Array.from({ length: exercise.sets }, (_, setIndex) => {
-                                                  const setReps = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps');
-                                                  const setWeight = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight');
-                                                  const isSetCompleted = setReps !== '' && setWeight !== '';
-                                                  
-                                                  return (
-                                                    <div key={`log-${exercise.id}-${setIndex}`} className="grid grid-cols-8 gap-2">
-                                                      <div className={`flex items-center justify-center text-xs text-gray-300 bg-neutral-800 border border-neutral-700 rounded text-white ${isSetCompleted ? 'border-blue-500' : ''}`}>
-                                                        {setIndex + 1}
-                                                      </div>
-                                                      <div className="flex items-center justify-center text-gray-300">
-                                                        ×
-                                                      </div>
-                                                      <div className={`col-span-2 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
-                                                        <input 
-                                                          type="number"
-                                                          placeholder="Reps"
-                                                          value={setReps}
-                                                          onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps', e.target.value)}
-                                                          className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
-                                                        />
-                                                      </div>
-                                                      <div className="flex items-center justify-center text-gray-300">
-                                                        :
-                                                      </div>
-                                                      <div className={`col-span-3 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
-                                                        <input 
-                                                          type="number"
-                                                          placeholder="Weight"
-                                                          value={setWeight}
-                                                          onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight', e.target.value)}
-                                                          className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
-                                                        />
-                                                      </div>
-                                                    </div>
-                                                  )})}
-                                                  <div className="flex justify-end mt-3">
-                                                    <Button
-                                                      size="sm"
-                                                      className={`flex items-center gap-1 ${
-                                                        completed 
-                                                          ? "bg-green-700 hover:bg-green-800 text-white" 
-                                                          : "bg-blue-600 hover:bg-blue-700 text-white"
-                                                      }`}
-                                                      onClick={() => {
-                                                        toggleExerciseCompletion(exercise.id!, dateStr);
-                                                      }}
-                                                    >
-                                                      {completed ? (
-                                                        <>
-                                                          <CheckCircle className="h-4 w-4" />
-                                                          
-                                                        </>
-                                                      ) : (
-                                                        <>
-                                                          <CheckCircle className="h-4 w-4" />
-                                                          Save
-                                                        </>
-                                                      )}
-                                                    </Button>
-                                                  </div>
-                                              </div>
                                             </div>
-                                            <Badge 
-                                              className={`ml-2 ${
-                                                completed 
-                                                  ? "bg-green-900/50 text-green-300" 
-                                                  : "bg-blue-900/50 text-blue-300"
-                                              }`}
-                                            >
-                                              {completed ? "Completed" : "In Progress"}
-                                            </Badge>
+                                            
+                                            {/* Log Exercise Inputs - Only show when expanded */}
+                                            {expanded && (
+                                              <div className="p-3 pt-0 border-t border-neutral-800 bg-neutral-900/50">
+                                                <div className="mt-2 space-y-2">
+                                                  <div className="grid grid-cols-8 gap-2 text-xs text-gray-400 px-1">
+                                                    <div>Set</div>
+                                                    <div className="flex items-center justify-center"></div>
+                                                    <div className="col-span-2">Reps</div>
+                                                    <div className="flex items-center justify-center"></div>
+                                                    <div className="col-span-3">Weight (lbs)</div>
+                                                  </div>
+                                                  {Array.from({ length: exercise.sets }, (_, setIndex) => {
+                                                    const setReps = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps');
+                                                    const setWeight = getLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight');
+                                                    const isSetCompleted = setReps !== '' && setWeight !== '';
+                                                    
+                                                    return (
+                                                      <div key={`log-${exercise.id}-${setIndex}`} className="grid grid-cols-8 gap-2">
+                                                        <div className={`flex items-center justify-center text-xs text-gray-300 bg-neutral-800 border border-neutral-700 rounded text-white ${isSetCompleted ? 'border-blue-500' : ''}`}>
+                                                          {setIndex + 1}
+                                                        </div>
+                                                        <div className="flex items-center justify-center text-gray-300">
+                                                          ×
+                                                        </div>
+                                                        <div className={`col-span-2 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
+                                                          <input 
+                                                            type="number"
+                                                            placeholder="Reps"
+                                                            value={setReps}
+                                                            onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps', e.target.value)}
+                                                            className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
+                                                          />
+                                                        </div>
+                                                        <div className="flex items-center justify-center text-gray-300">
+                                                          :
+                                                        </div>
+                                                        <div className={`col-span-3 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
+                                                          <input 
+                                                            type="number"
+                                                            placeholder="Weight"
+                                                            value={setWeight}
+                                                            onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight', e.target.value)}
+                                                            className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    )})}
+                                                    <div className="flex justify-end mt-3">
+                                                      <Button
+                                                        size="sm"
+                                                        className={`flex items-center gap-1 ${
+                                                          completed 
+                                                            ? "bg-green-700 hover:bg-green-800 text-white" 
+                                                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                                                        }`}
+                                                        onClick={(e) => {
+                                                          e.stopPropagation(); // Prevent triggering the parent click
+                                                          toggleExerciseCompletion(exercise.id!, dateStr);
+                                                        }}
+                                                      >
+                                                        {completed ? (
+                                                          <>
+                                                            <CheckCircle className="h-4 w-4" />
+                                                            
+                                                          </>
+                                                        ) : (
+                                                          <>
+                                                            <CheckCircle className="h-4 w-4" />
+                                                            Save
+                                                          </>
+                                                        )}
+                                                      </Button>
+                                                    </div>
+                                                </div>
+                                              </div>
+                                            )}
                                           </div>
                                         );
                                       })}
