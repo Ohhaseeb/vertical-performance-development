@@ -202,25 +202,25 @@ export default function Home() {
                     <ul className="text-gray-200 md:text-lg">
                       <li className="font-bold text-blue-400 mb-2">Coach Dylan's stats:</li>
                       <li className="flex items-center">
-                        <span className="mr-2 text-white">•</span> Vertical Jump: 37 inch
+                        <span className="mr-2 text-white">•</span> Vertical Jump: 39 inch
                       </li>
                       <li className="flex items-center">
-                        <span className="mr-2 text-white">•</span> Squat: 355LB
+                        <span className="mr-2 text-white">•</span> Squat: 340LB
                       </li>
                       <li className="flex items-center">
-                        <span className="mr-2 text-white">•</span> Deadlift: 385LB
+                        <span className="mr-2 text-white">•</span> Deadlift: 360LB
                       </li>
                       <li className="flex items-center">
-                        <span className="mr-2 text-white">•</span> Bench Press: 250LB
+                        <span className="mr-2 text-white">•</span> Bench Press: 230LB
                       </li>
                       <li className="flex items-center">
-                        <span className="mr-2 text-white">•</span> Power Clean: 215LB
+                        <span className="mr-2 text-white">•</span> Power Clean: 185LB
                       </li>
                       <li className="flex items-center">
                         <span className="mr-2 text-white">•</span> Volleyball at SJSU D1 team
                       </li>
                       <li className="flex items-center">
-                        <span className="mr-2 text-white">•</span> Height : 5'6
+                        <span className="mr-2 text-white">•</span> Height : 5'8
                       </li>
                     </ul>
                   </div>

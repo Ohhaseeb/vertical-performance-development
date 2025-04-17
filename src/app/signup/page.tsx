@@ -313,7 +313,7 @@ export default function Signup() {
                             className="border-neutral-700 text-blue-500"
                           />
                           <Label htmlFor="performance" className="text-gray-200">
-                            Performance - $15/month
+                            Performance - $25 every 3 months
                           </Label>
                         </div>
                       </RadioGroup>
