@@ -11,7 +11,7 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
         <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-blue-400">VPD</span>
+            <span className="text-xl font-bold text-blue-400">AA</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <Link href="#program" className="font-medium text-gray-200 transition-colors hover:text-blue-400">
@@ -47,7 +47,7 @@ export default function Home() {
                   Elevate Your Vertical Jump
                 </h1>
                 <p className="max-w-[600px] text-gray-200 md:text-xl mx-auto">
-                  VPD offers personalized week to week training tailored to each athlete's needs and goals to transform their vertical to the next level. 
+                  Ascend Athletics offers personalized week to week training tailored to each athlete's needs and goals to transform their vertical to the next level. 
                 </p>
                 <div className="pt-4">
                   <Button
@@ -75,7 +75,7 @@ export default function Home() {
                   Professional and Researched Based Vertical Jump Training
                 </h2>
                 <p className="max-w-[900px] text-gray-200 md:text-xl/relaxed">
-                  VPD provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
+                  Ascend provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
                 </p>
               </div>
             </div>
