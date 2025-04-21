@@ -351,7 +351,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <Link href="/">
               <div className="flex items-center">
-                <span className="text-xl font-bold text-blue-400">VPD</span>
+                <span className="text-xl font-bold text-blue-400">VDP</span>
               </div>
             </Link>
           </div>
@@ -400,6 +400,7 @@ export default function DashboardPage() {
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-white">Welcome back, {userFirstName}</h1>
                 <p className="text-gray-300">Here's your weekly workout schedule</p>
+                <p className="text-sm text-blue-400">(P.S) For the best experience using a mobile device, please rotate your device horizontally.</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button 
