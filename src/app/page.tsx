@@ -388,7 +388,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="mb-2 italic text-gray-200">
-                        "VDP and Coach Haseeb have been a game changer for me. I've improved my vertical jump by 4 inches and my hitting power has increased. His attention to detail as well as being able to push me in my training helped me become more prepared for my D1 volleyball season."
+                        "Ascend Athletics and Coach Haseeb have been a game changer for me. I've improved my vertical jump by 4 inches and my hitting power has increased. His attention to detail as well as being able to push me in my training helped me become more prepared for my D1 volleyball season."
                       </p>
                       <p className="font-semibold text-white">Charles Carroll</p>
                       <p className="text-sm text-gray-300">D1 Outside Hitter at St. Thomas Aquinas</p>
