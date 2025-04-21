@@ -13,7 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { createClientClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
@@ -152,7 +152,6 @@ export default function CoachDashboardPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-12 w-12 border border-blue-500">
-                        <AvatarImage src="/placeholder.svg" alt={user.first_name || "User"} />
                         <AvatarFallback className="bg-neutral-800 text-blue-400">
                           {user.first_name?.substring(0, 2).toUpperCase() || "U"}
                         </AvatarFallback>

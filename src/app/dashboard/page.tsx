@@ -22,7 +22,7 @@ import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, parseISO } from "da
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { getUser } from "@/queries/user"
@@ -369,7 +369,6 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Avatar className="h-8 w-8 border border-blue-500">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt={userFirstName} />
                   <AvatarFallback className="bg-neutral-800 text-blue-400">
                     {userFirstName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
@@ -660,7 +659,6 @@ export default function DashboardPage() {
                   <CardContent>
                     <div className="flex flex-col items-center text-center">
                       <Avatar className="h-20 w-20 border-2 border-blue-500 mb-4">
-                        <AvatarImage src="/placeholder.svg?height=80&width=80" alt={userFirstName} />
                         <AvatarFallback className="bg-neutral-800 text-blue-400 text-xl">
                           {userFirstName.substring(0, 1).toUpperCase()}
                         </AvatarFallback>

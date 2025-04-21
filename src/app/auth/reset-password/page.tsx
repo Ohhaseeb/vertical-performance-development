@@ -121,13 +121,9 @@ export default function ResetPassword() {
           <div className="flex items-center gap-2">
             <Link href="/">
               <div className="flex items-center gap-2">
-                <Image
-                  src="/placeholder.svg?height=32&width=32"
-                  width={32}
-                  height={32}
-                  alt="VPD Logo"
-                  className="rounded"
-                />
+                <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold">
+                  V
+                </div>
                 <span className="text-xl font-bold text-blue-400">VPD</span>
               </div>
             </Link>
