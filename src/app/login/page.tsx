@@ -78,7 +78,7 @@ export default function Login() {
             <Link href="/">
               <div className="flex items-center gap-2">
               
-                <span className="text-xl font-bold text-blue-400 px-8">VPD</span>
+                <span className="text-xl font-bold text-blue-400 px-8">VDP</span>
               </div>
             </Link>
           </div>

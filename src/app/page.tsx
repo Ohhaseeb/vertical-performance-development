@@ -11,7 +11,7 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
         <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-blue-400">AA</span>
+            <span className="text-xl font-bold text-blue-400">VDP</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <Link href="#program" className="font-medium text-gray-200 transition-colors hover:text-blue-400">
@@ -47,7 +47,7 @@ export default function Home() {
                   Elevate Your Vertical Jump
                 </h1>
                 <p className="max-w-[600px] text-gray-200 md:text-xl mx-auto">
-                  Ascend Athletics offers personalized week to week training tailored to each athlete's needs and goals to transform their vertical to the next level. 
+                  VDP offers personalized week to week training tailored to each athlete's needs and goals to transform their vertical to the next level. 
                 </p>
                 <div className="pt-4">
                   <Button
@@ -75,7 +75,7 @@ export default function Home() {
                   Professional and Researched Based Vertical Jump Training
                 </h2>
                 <p className="max-w-[900px] text-gray-200 md:text-xl/relaxed">
-                  Ascend provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
+                  VDP provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
                 </p>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function Home() {
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-start">
               <div className="space-y-4">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">
-                  About Ascend
+                  About VDP
                 </h2>
                 <p className="text-gray-200 md:text-lg">
                   Hi there! I'm Coach Haseeb and I have been training for 5+ years, vertical jump training for 4+ years, and coaching volleyball for 2+ years. I transformed my vertical from not even being able to touch rim to a 37-38 inch vertical purely through training and research. I love training and have a passion for helping athletes reach their full potential, VPD was created to be an more affordable option for athletes willing to put in the hard work to increase their vertical.
@@ -388,7 +388,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="mb-2 italic text-gray-200">
-                        "Ascend Athletics and Coach Haseeb have been a game changer for me. I've improved my vertical jump by 4 inches and my hitting power has increased. His attention to detail as well as being able to push me in my training helped me become more prepared for my D1 volleyball season."
+                        "VDP and Coach Haseeb have been a game changer for me. I've improved my vertical jump by 4 inches and my hitting power has increased. His attention to detail as well as being able to push me in my training helped me become more prepared for my D1 volleyball season."
                       </p>
                       <p className="font-semibold text-white">Charles Carroll</p>
                       <p className="text-sm text-gray-300">D1 Outside Hitter at St. Thomas Aquinas</p>
@@ -507,7 +507,7 @@ export default function Home() {
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-7 w-7 text-blue-400" />
-                      <span className="text-gray-200">3 inches of vertical jump increase guaranteed within 3 months or you get trained for free until you hit that goal</span>
+                      <span className="text-gray-200">4-6 inches of vertical jump increase guaranteed within 3 months or you get trained for free until you hit that goal</span>
                     </li>
                   </ul>
                 </CardContent>
