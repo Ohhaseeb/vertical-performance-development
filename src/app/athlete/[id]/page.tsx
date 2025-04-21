@@ -3,13 +3,13 @@
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { createClientClient } from "@/utils/supabase/client"
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Copy, Check, X, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus, Check, Trash2 } from "lucide-react"
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday } from "date-fns"
 import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogOverlay } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import {
