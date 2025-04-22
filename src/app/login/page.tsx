@@ -73,16 +73,15 @@ export default function Login() {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-900 to-black">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
+        <div className="w-full flex h-16 items-center justify-between py-4 px-8">
+          <div className="flex items-center">
             <Link href="/">
-              <div className="flex items-center gap-2">
-              
-                <span className="text-xl font-bold text-blue-400 px-8">VDP</span>
+              <div className="flex items-center">
+                <span className="text-xl font-bold text-blue-400">VDP</span>
               </div>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <Button className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90" asChild>
               <Link href="/">Back to Home</Link>
             </Button>
