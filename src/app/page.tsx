@@ -41,18 +41,18 @@ export default function Home() {
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-blue-900 to-black">
           <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-center justify-center text-center max-w-3xl mx-auto">
+            <div className="flex flex-col items-center justify-center text-center mx-auto">
               <div className="space-y-4">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none text-white">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl/none font-bold tracking-tighter text-white">
                   Elevate Your Vertical Jump
                 </h1>
-                <p className="max-w-[600px] text-gray-200 md:text-xl mx-auto">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 mx-auto px-2">
                   VDP offers personalized week to week training tailored to each athlete's needs and goals to transform their vertical to the next level. 
                 </p>
                 <div className="pt-4">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90 px-20 min-w-[300px]"
+                    className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90 px-4 sm:px-8 md:px-12 w-full sm:w-auto"
                     asChild
                   >
                     <Link href="/signup">Your Vertical Jump Transformation Starts Here</Link>
@@ -71,10 +71,10 @@ export default function Home() {
           <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tighter bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent px-2">
                   Professional and Researched Based Vertical Jump Training
                 </h2>
-                <p className="max-w-[900px] text-gray-200 md:text-xl/relaxed">
+                <p className="text-sm sm:text-base md:text-lg text-gray-200 mx-auto px-2">
                   VDP provides personalized training programs tailored to your exact needs, we dont use a one size fits all approach.
                 </p>
               </div>
