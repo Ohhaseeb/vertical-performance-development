@@ -42,7 +42,22 @@ export default function Home() {
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-blue-900 to-black">
           <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center justify-center text-center mx-auto">
-              <div className="space-y-4">
+              <div className="space-y-6">
+                <div className="flex justify-center">
+                  <Image
+                    src="/images/VDP transparent.png"
+                    alt="VDP Logo"
+                    width={300}
+                    height={200}
+                    className="object-contain mb-4 w-[120px] sm:w-[150px] md:w-[200px] lg:w-[250px] xl:w-[300px] h-auto"
+                    priority
+                    quality={100}
+                    style={{
+                      maxWidth: '100%',
+                      height: 'auto'
+                    }}
+                  />
+                </div>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl/none font-bold tracking-tighter text-white">
                   Elevate Your Vertical Jump
                 </h1>
