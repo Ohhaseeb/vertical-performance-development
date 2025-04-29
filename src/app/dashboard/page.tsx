@@ -279,28 +279,22 @@ export default function DashboardPage() {
   const calculateWorkoutsCompleted = () => {
     if (!trainingPlans.length) return 0;
     
-    // Count all assigned exercises
-    const totalAssignedExercises = trainingPlans.reduce((total, plan) => {
-      return total + (plan.exercises_data?.length || 0);
-    }, 0);
+    // Group exercises by date to count each day's workout
+    const scheduledWorkoutDays = [...new Set(trainingPlans.flatMap(plan => 
+      plan.exercises_data && plan.exercises_data.length > 0 ? [plan.date] : []
+    ))];
     
-    // Count completed exercises
-    const totalCompletedExercises = completedExercises.length;
+    // Count days where at least one exercise was completed
+    const completedWorkoutDays = [...new Set(completedExercises.map(ex => ex.date))];
     
-    // Only count completions that match assigned exercises
-    const validCompletedExercises = completedExercises.filter(completed => {
-      // Find if this completed exercise exists in any training plan
-      return trainingPlans.some(plan => 
-        plan.exercises_data?.some(exercise => 
-          exercise.id === completed.exerciseId && 
-          plan.date === completed.date
-        )
-      );
-    }).length;
+    // Get the intersection of scheduled and completed days
+    const completedScheduledDays = completedWorkoutDays.filter(date => 
+      scheduledWorkoutDays.includes(date)
+    );
     
-    // Calculate percentage (protect against division by zero)
-    return totalAssignedExercises > 0 
-      ? Math.min(100, Math.round((validCompletedExercises / totalAssignedExercises) * 100))
+    // Calculate the percentage (completed / scheduled)
+    return scheduledWorkoutDays.length > 0 
+      ? Math.round((completedScheduledDays.length / scheduledWorkoutDays.length) * 100)
       : 0;
   };
 
@@ -347,7 +341,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-black dark">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
-        <div className="container max-w-screen-xl mx-auto px-8 flex h-16 items-center justify-between py-4">
+        <div className="container max-w-screen-xl mx-auto px-4 sm:px-8 flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <Link href="/">
               <div className="flex items-center">
@@ -355,7 +349,7 @@ export default function DashboardPage() {
               </div>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <div className="hidden md:flex items-center gap-6 text-sm">
               <Link href="/dashboard" className="font-medium text-blue-400 transition-colors">
                 Dashboard
@@ -366,7 +360,7 @@ export default function DashboardPage() {
                 Progress
               </button>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div className="relative">
                 <Avatar className="h-8 w-8 border border-blue-500">
                   <AvatarFallback className="bg-neutral-800 text-blue-400">
@@ -392,41 +386,35 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="flex-1 py-8">
-        <div className="container max-w-screen-xl mx-auto px-8">
-          <div className="flex flex-col gap-8">
+      <main className="flex-1 py-4 sm:py-8">
+        <div className="container max-w-screen-xl mx-auto px-4 sm:px-8">
+          <div className="flex flex-col gap-4 sm:gap-8">
             {/* Dashboard Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Welcome back, {userFirstName}</h1>
-                <p className="text-gray-300">Here's your weekly workout schedule</p>
-                <p className="text-sm text-blue-400">(P.S) For the best experience using a mobile device, please rotate your device horizontally.</p>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">Welcome back, {userFirstName}</h1>
+                <p className="text-sm sm:text-base text-gray-300">Here's your weekly workout schedule</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="border-blue-500 text-gray-200 hover:text-blue-400"
+                  className="flex-1 md:flex-none border-blue-500 text-gray-200 hover:text-blue-400"
                 >
                   <Calendar className="mr-2 h-4 w-4" />
                   Full Calendar
                 </Button>
                 <Button 
-                  className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90" 
+                  className="flex-1 md:flex-none bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90" 
                   size="sm"
                   onClick={() => {
-                    // Find today's date and scroll to it if it exists
                     const today = new Date();
-                    const todayStr = format(today, 'EEEE'); // Get day name like "Monday"
-                    
-                    // Find the element with today's day - note this will change based on your DOM structure
+                    const todayStr = format(today, 'EEEE');
                     const todayElement = document.getElementById(`day-${todayStr}`) || 
-                                         document.querySelector(`[data-day="${todayStr}"]`);
-                    
+                                       document.querySelector(`[data-day="${todayStr}"]`);
                     if (todayElement) {
                       todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     } else {
-                      // If we can't find today's element, just scroll to the workout section
                       const workoutSection = document.getElementById('weekly-schedule');
                       if (workoutSection) {
                         workoutSection.scrollIntoView({ behavior: 'smooth' });
@@ -441,13 +429,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Main Dashboard Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* Weekly Schedule */}
-              <div className="lg:col-span-3 space-y-6">
+              <div className="lg:col-span-3 space-y-4 sm:space-y-6">
                 <Card className="bg-neutral-950 border border-blue-500" id="weekly-schedule">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-white text-xl">Weekly Schedule</CardTitle>
+                      <CardTitle className="text-white text-lg sm:text-xl">Weekly Schedule</CardTitle>
                       <div className="flex items-center gap-2">
                         <Button 
                           variant="ghost" 
@@ -458,7 +446,7 @@ export default function DashboardPage() {
                           <ChevronLeft className="h-4 w-4" />
                           <span className="sr-only">Previous Week</span>
                         </Button>
-                        <span className="text-sm text-gray-200">{currentWeekDisplay}</span>
+                        <span className="text-xs sm:text-sm text-gray-200">{currentWeekDisplay}</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
@@ -470,10 +458,10 @@ export default function DashboardPage() {
                         </Button>
                       </div>
                     </div>
-                    <CardDescription className="text-gray-300">Your weekly training exercises</CardDescription>
+                    <CardDescription className="text-sm text-gray-300">Your weekly training exercises</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {daysOfWeek
                         .filter((day, index) => showAllDays || index < 3)
                         .map((day) => {
@@ -491,12 +479,12 @@ export default function DashboardPage() {
                               data-day={day}
                               className="rounded-lg overflow-hidden bg-neutral-900 border border-neutral-800"
                             >
-                              <div className="flex flex-row">
-                                <div className="bg-blue-900 p-4 w-32 flex flex-col justify-center items-center">
-                                  <div className="text-white font-bold text-base">{day}</div>
-                                  <div className="text-white text-sm">{formattedDate}</div>
+                              <div className="flex flex-col sm:flex-row">
+                                <div className="bg-blue-900 p-3 sm:p-4 sm:w-32 flex flex-row sm:flex-col justify-between sm:justify-center items-center">
+                                  <div className="text-white font-bold text-sm sm:text-base">{day}</div>
+                                  <div className="text-white text-xs sm:text-sm">{formattedDate}</div>
                                 </div>
-                                <div className="flex-1 p-4">
+                                <div className="flex-1 p-3 sm:p-4">
                                   {exercises.length > 0 ? (
                                     <div className="space-y-3">
                                       {exercises.map((exercise) => {
@@ -506,27 +494,27 @@ export default function DashboardPage() {
                                         return (
                                           <div key={exercise.id} className="rounded-md overflow-hidden border border-neutral-800 bg-neutral-950">
                                             <div 
-                                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-neutral-900 transition-colors"
+                                              className="flex items-center justify-between p-2 sm:p-3 cursor-pointer hover:bg-neutral-900 transition-colors"
                                               onClick={(e) => {
-                                                e.stopPropagation(); // Prevent triggering the parent click
+                                                e.stopPropagation();
                                                 toggleExerciseExpansion(exercise.id!, dateStr);
                                               }}
                                             >
-                                              <div className="flex-1">
+                                              <div className="flex-1 min-w-0">
                                                 <div className="flex items-center">
-                                                  <h3 className="font-semibold text-white">{exercise.exercise_name}</h3>
+                                                  <h3 className="font-semibold text-sm sm:text-base text-white truncate">{exercise.exercise_name}</h3>
                                                   {completed && (
-                                                    <CheckCircle className="ml-2 h-4 w-4 text-green-500" />
+                                                    <CheckCircle className="ml-2 h-4 w-4 text-green-500 flex-shrink-0" />
                                                   )}
                                                 </div>
-                                                <p className="text-sm text-gray-300">
+                                                <p className="text-xs sm:text-sm text-gray-300 truncate">
                                                   {exercise.sets} sets × {exercise.reps} reps
                                                   {exercise.notes && ` • ${exercise.notes}`}
                                                 </p>
                                               </div>
-                                              <div className="flex items-center gap-2">
+                                              <div className="flex items-center gap-2 ml-2 flex-shrink-0">
                                                 <Badge 
-                                                  className={`${
+                                                  className={`text-xs ${
                                                     completed 
                                                       ? "bg-green-900/50 text-green-300" 
                                                       : "bg-blue-900/50 text-blue-300"
@@ -542,15 +530,15 @@ export default function DashboardPage() {
                                               </div>
                                             </div>
                                             
-                                            {/* Log Exercise Inputs - Only show when expanded */}
+                                            {/* Log Exercise Inputs - Mobile Optimized */}
                                             {expanded && (
-                                              <div className="p-3 pt-0 border-t border-neutral-800 bg-neutral-900/50">
+                                              <div className="p-2 sm:p-3 pt-0 border-t border-neutral-800 bg-neutral-900/50">
                                                 <div className="mt-2 space-y-2">
-                                                  <div className="grid grid-cols-8 gap-2 text-xs text-gray-400 px-1">
+                                                  <div className="grid grid-cols-7 sm:grid-cols-8 gap-2 text-xs text-gray-400 px-1">
                                                     <div>Set</div>
-                                                    <div className="flex items-center justify-center"></div>
+                                                    <div className="flex items-center justify-center hidden sm:flex"></div>
                                                     <div className="col-span-2">Reps</div>
-                                                    <div className="flex items-center justify-center"></div>
+                                                    <div className="flex items-center justify-center hidden sm:flex"></div>
                                                     <div className="col-span-3">Weight (lbs)</div>
                                                   </div>
                                                   {Array.from({ length: exercise.sets }, (_, setIndex) => {
@@ -559,11 +547,11 @@ export default function DashboardPage() {
                                                     const isSetCompleted = setReps !== '' && setWeight !== '';
                                                     
                                                     return (
-                                                      <div key={`log-${exercise.id}-${setIndex}`} className="grid grid-cols-8 gap-2">
+                                                      <div key={`log-${exercise.id}-${setIndex}`} className="grid grid-cols-7 sm:grid-cols-8 gap-2">
                                                         <div className={`flex items-center justify-center text-xs text-gray-300 bg-neutral-800 border border-neutral-700 rounded text-white ${isSetCompleted ? 'border-blue-500' : ''}`}>
                                                           {setIndex + 1}
                                                         </div>
-                                                        <div className="flex items-center justify-center text-gray-300">
+                                                        <div className="flex items-center justify-center text-gray-300 hidden sm:flex">
                                                           ×
                                                         </div>
                                                         <div className={`col-span-2 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
@@ -572,10 +560,10 @@ export default function DashboardPage() {
                                                             placeholder="Reps"
                                                             value={setReps}
                                                             onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'reps', e.target.value)}
-                                                            className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
+                                                            className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-xs sm:text-sm w-full focus:border-blue-500 focus:outline-none"
                                                           />
                                                         </div>
-                                                        <div className="flex items-center justify-center text-gray-300">
+                                                        <div className="flex items-center justify-center text-gray-300 hidden sm:flex">
                                                           :
                                                         </div>
                                                         <div className={`col-span-3 flex items-center ${isSetCompleted ? 'bg-blue-900/20 rounded' : ''}`}>
@@ -584,7 +572,7 @@ export default function DashboardPage() {
                                                             placeholder="Weight"
                                                             value={setWeight}
                                                             onChange={(e) => updateLoggedSetValue(exercise.id!, dateStr, setIndex, 'weight', e.target.value)}
-                                                            className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-sm w-full focus:border-blue-500 focus:outline-none"
+                                                            className="py-1 px-2 bg-neutral-800 border border-neutral-700 rounded text-white text-xs sm:text-sm w-full focus:border-blue-500 focus:outline-none"
                                                           />
                                                         </div>
                                                       </div>
@@ -598,19 +586,18 @@ export default function DashboardPage() {
                                                             : "bg-blue-600 hover:bg-blue-700 text-white"
                                                         }`}
                                                         onClick={(e) => {
-                                                          e.stopPropagation(); // Prevent triggering the parent click
+                                                          e.stopPropagation();
                                                           toggleExerciseCompletion(exercise.id!, dateStr);
                                                         }}
                                                       >
                                                         {completed ? (
                                                           <>
                                                             <CheckCircle className="h-4 w-4" />
-                                                            
                                                           </>
                                                         ) : (
                                                           <>
                                                             <CheckCircle className="h-4 w-4" />
-                                                            Save
+                                                            <span className="text-xs sm:text-sm">Save</span>
                                                           </>
                                                         )}
                                                       </Button>
@@ -625,7 +612,7 @@ export default function DashboardPage() {
                                   ) 
                                   : (
                                     <div className="flex items-center">
-                                      <p className="text-sm text-gray-400">No exercises scheduled for this day</p>
+                                      <p className="text-xs sm:text-sm text-gray-400">No exercises scheduled for this day</p>
                                     </div>
                                   )}
                                 </div>
@@ -650,8 +637,8 @@ export default function DashboardPage() {
                 </Card>
               </div>
 
-              {/* Sidebar */}
-              <div className="space-y-6">
+              {/* Sidebar - Now stacks on mobile */}
+              <div className="space-y-4 sm:space-y-6">
                 {/* Profile Summary */}
                 <Card className="bg-neutral-950 border border-blue-500">
                   <CardHeader className="pb-2">
@@ -710,7 +697,7 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-300">Weekly Workouts Completed</span>
+                          <span className="text-sm text-gray-300">Workouts Completed</span>
                           <span className="text-sm text-white">{workoutsCompletedPercentage}%</span>
                         </div>
                         <Progress value={workoutsCompletedPercentage} className="h-2 bg-neutral-800">

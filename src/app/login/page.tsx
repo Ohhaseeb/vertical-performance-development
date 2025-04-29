@@ -115,9 +115,9 @@ export default function Login() {
                     />
                   </div>
                   <div className="grid gap-3">
-                    <Label htmlFor="password" className="text-gray-200">
-                      Password
-                    </Label>
+                      <Label htmlFor="password" className="text-gray-200">
+                        Password
+                      </Label>
                     <div className="relative">
                       <Input
                         id="password"
