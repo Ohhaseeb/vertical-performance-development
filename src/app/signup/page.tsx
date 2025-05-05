@@ -328,14 +328,16 @@ export default function Signup() {
                           setFormData(prev => ({ ...prev, termsAccepted: checked as boolean }))
                         }
                       />
-                      <Label htmlFor="termsAccepted" className="text-sm text-gray-300">
-                        I agree to the{" "}
-                        <span className="text-blue-400">
-                          Terms of Service
-                        </span>{" "}
-                        and{" "}
-                        <span className="text-blue-400">
-                          Privacy Policy
+                      <Label htmlFor="termsAccepted" className="text-sm text-gray-300 flex-wrap">
+                        <span className="flex flex-wrap">
+                          I agree to the{" "}
+                          <span className="text-blue-400 mx-1">
+                            Terms of Service
+                          </span>{" "}
+                          and{" "}
+                          <span className="text-blue-400 mx-1">
+                            Privacy Policy
+                          </span>
                         </span>
                       </Label>
                       {errors.termsAccepted && <p className="text-xs text-red-500 ml-2">{errors.termsAccepted}</p>}
