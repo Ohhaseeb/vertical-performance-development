@@ -9,11 +9,11 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-black dark">
       <header className="sticky top-0 z-40 border-b border-neutral-900 bg-black">
-        <div className="container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between py-4">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-blue-400">VDP</span>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm">
+          <nav className="hidden lg:flex items-center gap-6 text-sm pl-40 ">
             <Link href="#program" className="font-medium text-gray-200 transition-colors hover:text-blue-400">
               Program
             </Link>
