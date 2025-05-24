@@ -183,7 +183,7 @@ export default function Home() {
                   VDP was created by me and Coach Dylan because of a problem we had with other vertical jump programs. They are too expensive! I'm talking about the good ones like THP Strength, not the ones that are just super generic and outdated. I say this because we were both was once THP athletes ourselves paying upwards of $50 a month for a training methodologies that we had already been applying to myself (P.S that was on a discount, their regular price was over $100 a month!)
                 </p>
                 <p className="text-gray-200 md:text-lg">
-                  But the main issue lies in the fact that the training was not personalized to the athlete and we simply were not getting responses to questions on a timely matter, it felt like we were just a number to them. We've been there, done that, and I'm here to tell you that here at VDP we take great care of our clients. This is a guarantee because unlike these other programs which are big businesses, VDP has a smaller client base meaning we can give you the attention you deserve.
+                  But the main issue lies in the fact that the training was not personalized to the athlete and we simply were not getting responses to questions on a timely matter, it felt like we were just a number to them. We've been there, done that, and I'm here to tell you that here at VDP we take great care of our clients. 
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gray-900/50 rounded-lg p-6 border border-blue-500/30 shadow-lg">
