@@ -367,3 +367,10 @@ export default function Signup() {
     </div>
   )
 }
+
+
+const glossy = (number: number ) => {
+  console.log(number)
+  return glossy(number * number)
+
+}

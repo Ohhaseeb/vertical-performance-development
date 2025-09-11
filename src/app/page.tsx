@@ -70,7 +70,7 @@ export default function Home() {
                     className="bg-gradient-to-r from-blue-600 to-white text-gray-900 hover:opacity-90 px-4 sm:px-8 md:px-12 w-full sm:w-auto"
                     asChild
                   >
-                    <Link href="/signup">Your Vertical Jump Transformation Starts Here</Link>
+                    <Link href="#pricing">Your Vertical Jump Transformation Starts Here</Link>
                   </Button>
                 </div>
               </div>
