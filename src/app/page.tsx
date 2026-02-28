@@ -67,9 +67,20 @@ export default function Home() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative w-full py-16 md:py-28 lg:py-36 xl:py-48 overflow-hidden">
-          {/* Background effects */}
-          <div className="absolute inset-0 bg-[#0A0A0F]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-orange-950/20 via-transparent to-transparent" />
+          {/* Background image - greyed out */}
+          <div className="absolute inset-0">
+            <Image
+              src="/images/dumbell.png"
+              alt=""
+              fill
+              className="object-cover grayscale opacity-30"
+              priority
+              quality={80}
+            />
+          </div>
+          {/* Dark overlay + gradient effects on top of image */}
+          <div className="absolute inset-0 bg-[#0A0A0F]/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-orange-950/20 via-transparent to-[#0A0A0F]" />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[120px]" />
           <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-green-500/5 rounded-full blur-[100px]" />
 
